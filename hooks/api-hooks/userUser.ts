@@ -6,11 +6,11 @@ type LoginPayload = {
   password: string;
 };
 
-export const useLogin = () => {
-  return useMutation(async (data: LoginPayload) => {
-    const response = await api.post('/login', data);
-    const { token } = response.data;
-    localStorage.setItem('token', token);
-    return token;
-  });
-};
+// export const useLogin = () => {
+//   return useMutation(async (data: LoginPayload) => {
+//     const response = await api.post('/login', data);
+//     const { token } = response.data;
+//     localStorage.setItem('token', token);
+//     return token;
+//   });
+// };
