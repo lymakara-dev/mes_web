@@ -1,18 +1,12 @@
 'use client';
 
-import { useLogin } from '@/hooks/api-hooks/userUser';
 import { useState } from 'react';
 import { ChartBarInteractive } from './docs';
 
 export default function page() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const loginMutation = useLogin();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    loginMutation.mutate({ email, password });
-  };
 
   return (
     <div>
