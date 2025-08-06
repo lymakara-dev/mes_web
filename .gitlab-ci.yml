@@ -1,32 +1,59 @@
+image: node:20
+
 stages:
   - build
   - deploy
 
-build_app:
-  stage: build
-  image: node:18
-  script:
-    - echo "Installing dependencies..."
-    - npm install --frozen-lockfile
-    - echo "Building the Next.js app..."
-    - npm run build
-  only:
-    - branches
+variables:
+  APP_NAME: codera-web
+  APP_DIR: /home/gic/mes-deployment/web
+  NODE_ENV: production
+  NODE_OPTIONS: "--max-old-space-size=4096"
 
-deploy_to_server:
-  stage: deploy
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .next/cache/
+
+build_project:
+  stage: build
+  tags:
+    - runner111  # Replace with your actual runner tag
   script:
-    - echo "Deploying Next.js app to production server"
-    - ssh $SSH_USER@$SSH_HOST << EOF
-        cd $DEPLOY_PATH
-        git pull origin $CI_COMMIT_REF_NAME
-        npm install --frozen-lockfile
-        npm run build
-        pm2 restart next-app || pm2 start npm --name "next-app" -- run start
-      EOF
+    - echo "⏳ Starting CI/CD for $APP_NAME.."
+    - whoami
+    - pwd
+    - echo "🏗️ Building $APP_NAME..."
+    - rm -rf node_modules .next
+    - npx next telemetry disable
+    - npm install --legacy-peer-deps
+    - npm run build
+    # - NODE_OPTIONS="--max-old-space-size=4096" npx next build
+  artifacts:
+    paths:
+      - .next
+      - node_modules
   only:
-    - branches
-  environment:
-    name: production
-  dependencies:
-    - build_app
+    - main
+
+deploy:
+  stage: deploy
+  before_script:
+    - echo "🔐 Preparing SSH access..."
+    # - mkdir -p ~/.ssh
+    # - echo "$DEPLOY_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    # - chmod 600 ~/.ssh/id_rsa
+    # - ssh-keyscan -H 192.168.71.110 >> ~/.ssh/known_hosts
+  script:
+    - echo "🚀 Deploying to $APP_DIR on 192.168.71.110.."
+    - ssh gic@192.168.71.111 "
+      whoami &&
+      cd $APP_DIR &&
+       GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git fetch origin &&
+       GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git checkout production &&
+       GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin production &&
+       docker compose up -d --build
+      "
+  only:
+    - production
