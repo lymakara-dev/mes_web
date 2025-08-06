@@ -18,8 +18,6 @@ cache:
 
 build_project:
   stage: build
-  tags:
-    - runner111  # Replace with your actual runner tag
   script:
     - echo "⏳ Starting CI/CD for $APP_NAME.."
     - whoami
