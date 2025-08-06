@@ -10,6 +10,7 @@ export default function page() {
 
   return (
     <div>
+      <h1>CICD JOB</h1>
       <div>
         <h1>From Shadcn</h1>
         <h2>usage: npx shadcn@latest add chart</h2>
