@@ -36,9 +36,9 @@ deploy:
     # - ssh-keyscan -H 192.168.71.110 >> ~/.ssh/known_hosts
   script:
     - echo "🚀 Deploying to $APP_DIR on 192.168.71.110.."
-    - ssh gic@192.168.71.111 "
+    - "
       whoami &&
-      cd $APP_DIR &&
+      cd /home/gic/mes-deployment/mes_web &&
        GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin &&
        docker build -t mes-web . && docker run -d -p 3004:3000 mes-web
       "
