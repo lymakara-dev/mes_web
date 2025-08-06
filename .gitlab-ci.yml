@@ -23,8 +23,8 @@ build_project:
     - whoami
     - pwd
     - echo "🏗️ Building $APP_NAME..."
-    - rm -rf node_modules .next
-    - npx next telemetry disable
+    # - rm -rf node_modules .next
+    # - npx next telemetry disable
     - npm install
     - npm install @tailwindcss/postcss --save-dev
     - npm run build
