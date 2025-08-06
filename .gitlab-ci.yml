@@ -36,13 +36,17 @@ build_app:
 deploy:
   stage: deploy
   before_script:
-    - echo "🔐 Preparing SSH access..."
+    - echo "🔐 Preparing Deployment process..."
   script:
-    - echo "🚀 Deploying to $APP_DIR on 192.168.71.110.."
+    - echo "🚀 Deploying to $APP_DIR on server"
     - |
-      cd /home/gic/mes-deployment/mes_web &&
-      GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin &&
-      docker build -t mes-web . && docker run -d -p 9004:3000 mes-web
-      "
+        whoami &&
+        cd /home/gic/mes-deployment/mes_web &&
+        GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin main &&
+        docker build -t mes-web . &&
+        # Stop and remove container if running
+        docker rm -f mes-web-container || true &&
+        docker run -d --name mes-web-container -p 9004:3000 mes-web
   only:
     - main
+
