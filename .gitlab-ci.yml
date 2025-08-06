@@ -25,7 +25,7 @@ build_project:
     - echo "🏗️ Building $APP_NAME..."
     - rm -rf node_modules .next
     - npx next telemetry disable
-    - npm install --legacy-peer-deps
+    - npm install
     - npm run build
     # - NODE_OPTIONS="--max-old-space-size=4096" npx next build
   artifacts:
