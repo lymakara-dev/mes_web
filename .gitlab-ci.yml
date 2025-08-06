@@ -26,23 +26,23 @@ build_app:
     paths:
       - node_modules/
 
-# deploy:
-#   stage: deploy
-#   before_script:
-#     - echo "🔐 Preparing SSH access..."
-#     # - mkdir -p ~/.ssh
-#     # - echo "$DEPLOY_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-#     # - chmod 600 ~/.ssh/id_rsa
-#     # - ssh-keyscan -H 192.168.71.110 >> ~/.ssh/known_hosts
-#   script:
-#     - echo "🚀 Deploying to $APP_DIR on 192.168.71.110.."
-#     - ssh gic@192.168.71.111 "
-#       whoami &&
-#       cd $APP_DIR &&
-#        GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git fetch origin &&
-#        GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git checkout production &&
-#        GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin production &&
-#        docker compose up -d --build
-#       "
-#   only:
-#     - production
+deploy:
+  stage: deploy
+  before_script:
+    - echo "🔐 Preparing SSH access..."
+    # - mkdir -p ~/.ssh
+    # - echo "$DEPLOY_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    # - chmod 600 ~/.ssh/id_rsa
+    # - ssh-keyscan -H 192.168.71.110 >> ~/.ssh/known_hosts
+  script:
+    - echo "🚀 Deploying to $APP_DIR on 192.168.71.110.."
+    - ssh gic@192.168.71.111 "
+      whoami &&
+      cd $APP_DIR &&
+       GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git fetch origin &&
+       GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git checkout production &&
+       GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin production &&
+       docker compose up -d --build
+      "
+  only:
+    - main
