@@ -1,0 +1,32 @@
+stages:
+  - build
+  - deploy
+
+build_app:
+  stage: build
+  image: node:18
+  script:
+    - echo "Installing dependencies..."
+    - npm install --frozen-lockfile
+    - echo "Building the Next.js app..."
+    - npm run build
+  only:
+    - branches
+
+deploy_to_server:
+  stage: deploy
+  script:
+    - echo "Deploying Next.js app to production server"
+    - ssh $SSH_USER@$SSH_HOST << EOF
+        cd $DEPLOY_PATH
+        git pull origin $CI_COMMIT_REF_NAME
+        npm install --frozen-lockfile
+        npm run build
+        pm2 restart next-app || pm2 start npm --name "next-app" -- run start
+      EOF
+  only:
+    - branches
+  environment:
+    name: production
+  dependencies:
+    - build_app
