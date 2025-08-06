@@ -1,59 +1,48 @@
 image: node:20
 
 stages:
+  - install
   - build
-  - deploy
+  # - deploy
 
-variables:
-  APP_NAME: codera-web
-  APP_DIR: /home/gic/mes-deployment/web
-  NODE_ENV: production
-  NODE_OPTIONS: "--max-old-space-size=4096"
+install_dependencies:
+  stage: install
+  script:
+    - echo "Installing dependencies..."
+    - npm ci  # faster than `npm install` for CI
+  cache:
+    key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+      - package-lock.json
 
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - node_modules/
-    - .next/cache/
-
-build_project:
+build_app:
   stage: build
   script:
-    - echo "⏳ Starting CI/CD for $APP_NAME.."
-    - whoami
-    - pwd
-    - echo "🏗️ Building $APP_NAME..."
-    # - rm -rf node_modules .next
-    # - npx next telemetry disable
-    - npm install
-    # - npm install -D tailwindcss postcss autoprefixer @tailwindcss/postcss
-    # - NODE_OPTIONS="--max-old-space-size=4096" npx next build
+    - echo "Building app..."
     - npm run build
-    # - NODE_OPTIONS="--max-old-space-size=4096" npx next build
-  artifacts:
+  cache:
+    key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
     paths:
-      - .next
-      - node_modules
-  only:
-    - main
+      - node_modules/
 
-deploy:
-  stage: deploy
-  before_script:
-    - echo "🔐 Preparing SSH access..."
-    # - mkdir -p ~/.ssh
-    # - echo "$DEPLOY_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    # - chmod 600 ~/.ssh/id_rsa
-    # - ssh-keyscan -H 192.168.71.110 >> ~/.ssh/known_hosts
-  script:
-    - echo "🚀 Deploying to $APP_DIR on 192.168.71.110.."
-    - ssh gic@192.168.71.111 "
-      whoami &&
-      cd $APP_DIR &&
-       GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git fetch origin &&
-       GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git checkout production &&
-       GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin production &&
-       docker compose up -d --build
-      "
-  only:
-    - production
+# deploy:
+#   stage: deploy
+#   before_script:
+#     - echo "🔐 Preparing SSH access..."
+#     # - mkdir -p ~/.ssh
+#     # - echo "$DEPLOY_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+#     # - chmod 600 ~/.ssh/id_rsa
+#     # - ssh-keyscan -H 192.168.71.110 >> ~/.ssh/known_hosts
+#   script:
+#     - echo "🚀 Deploying to $APP_DIR on 192.168.71.110.."
+#     - ssh gic@192.168.71.111 "
+#       whoami &&
+#       cd $APP_DIR &&
+#        GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git fetch origin &&
+#        GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git checkout production &&
+#        GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin production &&
+#        docker compose up -d --build
+#       "
+#   only:
+#     - production
