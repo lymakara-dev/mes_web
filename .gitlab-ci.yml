@@ -1,37 +1,37 @@
 image: node:20
 
 stages:
-  - install
-  - build
+  # - install
+  # - build
   - deploy
 
 variables:
   # Tell npm to use the global cache dir of gitlab-runner user
   NPM_CONFIG_CACHE: "/home/gitlab-runner/.npm"
 
-install_dependencies:
-  stage: install
-  script:
-    - echo "Installing dependencies..."
-    - npm ci
-  cache:
-    key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
-    paths:
-      # Cache the global npm cache folder, NOT local node_modules
-      - /home/gitlab-runner/.npm
-      # Optionally cache node_modules if needed (but usually caching npm cache is enough)
-      # - node_modules/
-  # Since cache path is outside project dir, cache policy needs to be enabled accordingly
+# install_dependencies:
+#   stage: install
+#   script:
+#     - echo "Installing dependencies..."
+#     - npm ci
+#   cache:
+#     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
+#     paths:
+#       # Cache the global npm cache folder, NOT local node_modules
+#       - /home/gitlab-runner/.npm
+#       # Optionally cache node_modules if needed (but usually caching npm cache is enough)
+#       # - node_modules/
+#   # Since cache path is outside project dir, cache policy needs to be enabled accordingly
 
-build_app:
-  stage: build
-  script:
-    - echo "Building app..."
-    - npm run build
-  cache:
-    key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
-    paths:
-      - /home/gitlab-runner/.npm
+# build_app:
+#   stage: build
+#   script:
+#     - echo "Building app..."
+#     - npm run build
+#   cache:
+#     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
+#     paths:
+#       - /home/gitlab-runner/.npm
 
 deploy:
   stage: deploy
