@@ -13,7 +13,7 @@ install_dependencies:
   stage: install
   script:
     - echo "Installing dependencies..."
-    - npm ci
+    - npm ci --only=production
   cache:
     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
     paths:
@@ -43,10 +43,10 @@ deploy:
         whoami &&
         cd /home/gic/mes-deployment/mes_web &&
         GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin main &&
-        docker build -t mes-web . &&
+        docker build --build-arg ENV_FILE=.env.staging -t mes-web . &&
         # Stop and remove container if running
-        docker rm -f mes-web-container || true &&
-        docker run -d --name mes-web-container -p 9004:3000 mes-web
+        docker rm -f mes-web || true &&
+        docker run -d --name mes-web -p 9004:3000 mes-web
   only:
     - main
 
