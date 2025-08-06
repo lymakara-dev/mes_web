@@ -1,30 +1,30 @@
 image: node:20
 
 stages:
-  - install
-  - build
+  # - install
+  # - build
   - deploy
 
-install_dependencies:
-  stage: install
-  script:
-    - echo "Installing dependencies..."
-    - npm ci  # faster than `npm install` for CI
-  cache:
-    key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules/
-      - package-lock.json
+# install_dependencies:
+#   stage: install
+#   script:
+#     - echo "Installing dependencies..."
+#     - npm ci  # faster than `npm install` for CI
+#   cache:
+#     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
+#     paths:
+#       - node_modules/
+#       - package-lock.json
 
-build_app:
-  stage: build
-  script:
-    - echo "Building app..."
-    - npm run build
-  cache:
-    key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules/
+# build_app:
+#   stage: build
+#   script:
+#     - echo "Building app..."
+#     - npm run build
+#   cache:
+#     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
+#     paths:
+#       - node_modules/
 
 deploy:
   stage: deploy
