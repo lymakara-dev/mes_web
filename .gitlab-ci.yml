@@ -1,46 +1,48 @@
 image: node:20
 
 stages:
-  # - install
-  # - build
+  - install
+  - build
   - deploy
 
-# install_dependencies:
-#   stage: install
-#   script:
-#     - echo "Installing dependencies..."
-#     - npm ci  # faster than `npm install` for CI
-#   cache:
-#     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
-#     paths:
-#       - node_modules/
-#       - package-lock.json
+variables:
+  # Tell npm to use the global cache dir of gitlab-runner user
+  NPM_CONFIG_CACHE: "/home/gitlab-runner/.npm"
 
-# build_app:
-#   stage: build
-#   script:
-#     - echo "Building app..."
-#     - npm run build
-#   cache:
-#     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
-#     paths:
-#       - node_modules/
+install_dependencies:
+  stage: install
+  script:
+    - echo "Installing dependencies..."
+    - npm ci
+  cache:
+    key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
+    paths:
+      # Cache the global npm cache folder, NOT local node_modules
+      - /home/gitlab-runner/.npm
+      # Optionally cache node_modules if needed (but usually caching npm cache is enough)
+      # - node_modules/
+  # Since cache path is outside project dir, cache policy needs to be enabled accordingly
+
+build_app:
+  stage: build
+  script:
+    - echo "Building app..."
+    - npm run build
+  cache:
+    key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
+    paths:
+      - /home/gitlab-runner/.npm
 
 deploy:
   stage: deploy
   before_script:
     - echo "🔐 Preparing SSH access..."
-    # - mkdir -p ~/.ssh
-    # - echo "$DEPLOY_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    # - chmod 600 ~/.ssh/id_rsa
-    # - ssh-keyscan -H 192.168.71.110 >> ~/.ssh/known_hosts
   script:
     - echo "🚀 Deploying to $APP_DIR on 192.168.71.110.."
-    - "
-      whoami &&
+    - |
       cd /home/gic/mes-deployment/mes_web &&
-       GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin &&
-       docker build -t mes-web . && docker run -d -p 9004:3000 mes-web
+      GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin &&
+      docker build -t mes-web . && docker run -d -p 9004:3000 mes-web
       "
   only:
     - main
