@@ -3,7 +3,7 @@ image: node:20
 stages:
   - install
   - build
-  # - deploy
+  - deploy
 
 install_dependencies:
   stage: install
