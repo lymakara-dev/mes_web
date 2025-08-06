@@ -26,6 +26,7 @@ build_project:
     - rm -rf node_modules .next
     - npx next telemetry disable
     - npm install
+    - npm install @tailwindcss/postcss --save-dev
     - npm run build
     # - NODE_OPTIONS="--max-old-space-size=4096" npx next build
   artifacts:
