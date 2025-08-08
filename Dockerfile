@@ -37,7 +37,7 @@ COPY --from=build /app/package*.json ./
 COPY --from=build /app/next.config.js ./
 COPY --from=build /app/.env .env
 
-RUN npm install --omit=dev
+# RUN npm install --omit=dev
 
 ENV NODE_ENV=production
 EXPOSE 3000
