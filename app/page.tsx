@@ -18,7 +18,7 @@ export default function page() {
       </div>
       <div>
         <h1>API USAGE with react-query</h1>
-        <h1>CICD with fasted caceh 0.6secs</h1>
+        <h1>CICD with fasted cache</h1>
       </div>
 
     </div>
