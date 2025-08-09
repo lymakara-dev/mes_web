@@ -18,7 +18,7 @@ export default function page() {
       </div>
       <div>
         <h1>API USAGE with react-query</h1>
-        <h1>CICD with cache</h1>
+        <h1>CICD with cache2</h1>
       </div>
 
     </div>
