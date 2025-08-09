@@ -17,7 +17,8 @@ export default function page() {
         <ChartBarInteractive />
       </div>
       <div>
-        <h1>API USAGE with react-query CICD TESTING</h1>
+        <h1>API USAGE with react-query</h1>
+        <h1>CICD with cache</h1>
       </div>
 
     </div>
