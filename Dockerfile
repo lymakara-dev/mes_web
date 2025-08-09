@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 # Copy source files
 COPY . .
@@ -37,7 +37,7 @@ COPY --from=build /app/package*.json ./
 COPY --from=build /app/next.config.js ./
 COPY --from=build /app/.env .env
 
-RUN npm install
+RUN npm ci
 
 ENV NODE_ENV=production
 EXPOSE 3000
