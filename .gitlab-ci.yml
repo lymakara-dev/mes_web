@@ -1,37 +1,37 @@
 image: node:20
 
 stages:
-  # - build
+  - build
   - deploy
 
 variables:
   NPM_CONFIG_CACHE: "/home/gitlab-runner/.npm"
 
-# ---------- Build Stage ----------
-# build_app:
-#   stage: build
-#   script:
-#     - echo "📦 Installing dependencies..."
-#     - npm ci
-#     - echo "🏗 Building Next.js..."
-#     - npm run build
-#   cache:
-#     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
-#     paths:
-#       - /home/gitlab-runner/.npm
-#       - node_modules/
-#       - .next/
-#   artifacts:
-#     paths:
-#       - .next
-#       - package*.json
-#       - public
-#       - next.config.js
-#       - .env.production
-#       - node_modules/
-#     expire_in: 1 week
-#   only:
-#     - main
+---------- Build Stage ----------
+build_app:
+  stage: build
+  script:
+    - echo "📦 Installing dependencies..."
+    - npm ci
+    - echo "🏗 Building Next.js..."
+    - npm run build
+  cache:
+    key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
+    paths:
+      - /home/gitlab-runner/.npm
+      - node_modules/
+      - .next/
+  artifacts:
+    paths:
+      - .next
+      - package*.json
+      - public
+      - next.config.js
+      - .env.production
+      - node_modules/
+    expire_in: 1 week
+  only:
+    - main
 
 # ---------- Deploy Stage ----------
 deploy:
