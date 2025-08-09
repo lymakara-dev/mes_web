@@ -55,14 +55,17 @@ RUN npm ci --only=production
 FROM node:18-alpine AS production
 WORKDIR /app
 
-# Copy only necessary files
-COPY --from=base /app/node_modules ./node_modules
+# Copy built Next.js app from host (CI or server)
 COPY .next ./.next
 COPY public ./public
 COPY package*.json ./
 COPY next.config.js ./
 COPY .env.production .env
 
+# Install only production dependencies
+RUN npm ci --only=production
+
 ENV NODE_ENV=production
 EXPOSE 3000
 CMD ["npm", "start"]
+

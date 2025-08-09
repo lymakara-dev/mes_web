@@ -1,38 +1,39 @@
 # image: node:20
 
 # stages:
-#   # - install
 #   # - build
 #   - deploy
 
 # variables:
-#   # Tell npm to use the global cache dir of gitlab-runner user
 #   NPM_CONFIG_CACHE: "/home/gitlab-runner/.npm"
 
-# # install_dependencies:
-# #   stage: install
-# #   script:
-# #     - echo "Installing dependencies..."
-# #     - npm ci
-# #   cache:
-# #     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
-# #     paths:
-# #       # Cache the global npm cache folder, NOT local node_modules
-# #       - /home/gitlab-runner/.npm
-# #       # Optionally cache node_modules if needed (but usually caching npm cache is enough)
-# #       # - node_modules/
-# #   # Since cache path is outside project dir, cache policy needs to be enabled accordingly
-
+# # ---------- Build Stage ----------
 # # build_app:
 # #   stage: build
 # #   script:
-# #     - echo "Building app..."
+# #     - echo "📦 Installing dependencies..."
+# #     - npm ci
+# #     - echo "🏗 Building Next.js..."
 # #     - npm run build
 # #   cache:
 # #     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
 # #     paths:
 # #       - /home/gitlab-runner/.npm
+# #       - node_modules/
+# #       - .next/
+# #   artifacts:
+# #     paths:
+# #       - .next
+# #       - package*.json
+# #       - public
+# #       - next.config.js
+# #       - .env.production
+# #       - node_modules/
+# #     expire_in: 1 week
+# #   only:
+# #     - main
 
+# # ---------- Deploy Stage ----------
 # deploy:
 #   stage: deploy
 #   before_script:
@@ -43,8 +44,9 @@
 #         whoami &&
 #         cd /home/gic/mes-deployment/mes_web &&
 #         GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin main &&
-#         docker build -t mes-web . &&
-#         # Stop and remove container if running
+#         docker build \
+#           --cache-from mes-web:latest \
+#           -t mes-web . &&
 #         docker rm -f mes-web || true &&
 #         docker run -d --name mes-web -p 9004:3000 mes-web
 #   only:
@@ -53,53 +55,37 @@
 image: node:20
 
 stages:
-  # - build
   - deploy
 
 variables:
+  # Tell npm to use the global cache dir of gitlab-runner user
   NPM_CONFIG_CACHE: "/home/gitlab-runner/.npm"
 
-# ---------- Build Stage ----------
-# build_app:
-#   stage: build
-#   script:
-#     - echo "📦 Installing dependencies..."
-#     - npm ci
-#     - echo "🏗 Building Next.js..."
-#     - npm run build
-#   cache:
-#     key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
-#     paths:
-#       - /home/gitlab-runner/.npm
-#       - node_modules/
-#       - .next/
-#   artifacts:
-#     paths:
-#       - .next
-#       - package*.json
-#       - public
-#       - next.config.js
-#       - .env.production
-#       - node_modules/
-#     expire_in: 1 week
-#   only:
-#     - main
-
-# ---------- Deploy Stage ----------
 deploy:
   stage: deploy
   before_script:
     - echo "🔐 Preparing Deployment..."
   script:
-    - echo "🚀 Deploying to $APP_DIR on server"
+    - echo "🚀 Deploying to server..."
     - |
         whoami &&
         cd /home/gic/mes-deployment/mes_web &&
+        # Pull latest changes
         GIT_SSH_COMMAND='ssh -i ~/.ssh/gitlab' git pull origin main &&
-        docker build \
-          --cache-from mes-web:latest \
-          -t mes-web . &&
+        # Install dependencies using cache
+        npm ci &&
+        # Build Next.js app
+        npm run build &&
+        # Build Docker image using cache
+        docker build --cache-from mes-web:latest -t mes-web . &&
+        # Stop and remove existing container
         docker rm -f mes-web || true &&
+        # Run new container
         docker run -d --name mes-web -p 9004:3000 mes-web
+  cache:
+    key: ${CI_PROJECT_PATH}-${CI_COMMIT_REF_SLUG}
+    paths:
+      - /home/gitlab-runner/.npm
+      - node_modules/
   only:
     - main
