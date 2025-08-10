@@ -1,8 +1,9 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Next.js + HeroUI",
-  description: "Make beautiful websites regardless of your design experience.",
+  name: "MES Web Application",
+  description:
+    "A comprehensive Mock Exam System designed to help students practice, track progress, and improve performance with realistic exam simulations.",
   navItems: [
     {
       label: "Home",
