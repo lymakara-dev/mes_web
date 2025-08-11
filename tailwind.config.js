@@ -14,17 +14,17 @@ const config = {
         mono: ["var(--font-mono)"],
       },
       colors: {
-        primary: {
-          DEFAULT: "#106598F",
+        myPrimary: {
+          DEFAULT: "#106598FF",
           light: "#3B82F6",
           dark: "#1E40AF",
         },
-        secondary: {
+        mySecondary: {
           DEFAULT: "#F59E0B",
           light: "#FBBF24",
           dark: "#B45309",
         },
-        accent: {
+        myAccent: {
           DEFAULT: "#10B981",
           light: "#6EE7B7",
           dark: "#047857",
