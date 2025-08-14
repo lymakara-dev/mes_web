@@ -17,15 +17,20 @@ export function useApi() {
     },
 
     getUsers: async (): Promise<User[]> => {
-      const res = await api.get('/users');
+      const res = await api.get("/users");
       return res.data;
     },
 
     createUser: async (payload: Partial<User>): Promise<User> => {
-      const res = await api.post('/users', payload);
+      const res = await api.post("/users", payload);
       return res.data;
     },
 
+    Learn: async () => {
+      const res = await api.get("/learning");
+      console.log(res);
+      return res.data;
+    },
     // Add more as needed
   };
 }

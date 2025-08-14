@@ -24,7 +24,7 @@ interface Product {
 const tableData: Product[] = [
   {
     id: 1,
-    name: "MacBook Pro 13”",
+    name: "User 1",
     variants: "2 Variants",
     category: "Laptop",
     price: "$2399.00",
@@ -33,7 +33,7 @@ const tableData: Product[] = [
   },
   {
     id: 2,
-    name: "Apple Watch Ultra",
+    name: "User 2",
     variants: "1 Variant",
     category: "Watch",
     price: "$879.00",
@@ -42,7 +42,7 @@ const tableData: Product[] = [
   },
   {
     id: 3,
-    name: "iPhone 15 Pro Max",
+    name: "User 3",
     variants: "2 Variants",
     category: "SmartPhone",
     price: "$1869.00",
@@ -51,7 +51,7 @@ const tableData: Product[] = [
   },
   {
     id: 4,
-    name: "iPad Pro 3rd Gen",
+    name: "User 4",
     variants: "2 Variants",
     category: "Electronics",
     price: "$1699.00",
@@ -60,7 +60,7 @@ const tableData: Product[] = [
   },
   {
     id: 5,
-    name: "AirPods Pro 2nd Gen",
+    name: "User 5",
     variants: "1 Variant",
     category: "Accessories",
     price: "$240.00",
@@ -132,25 +132,25 @@ export default function RecentOrders() {
                 isHeader
                 className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Products
+                Name
               </TableCell>
               <TableCell
                 isHeader
                 className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Category
+                Score
               </TableCell>
               <TableCell
                 isHeader
                 className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Price
+                Rank
               </TableCell>
               <TableCell
                 isHeader
                 className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Status
+                Last Updated
               </TableCell>
             </TableRow>
           </TableHeader>
