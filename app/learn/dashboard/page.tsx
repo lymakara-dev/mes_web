@@ -1,6 +1,6 @@
 "use client";
 
-import RecentOrders from "@/components/learning/RecentOrders";
+import RecentOrders from "@/components/learn/RecentOrders";
 import { useApi } from "@/service/useApi";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -13,7 +13,7 @@ export default function page() {
   useEffect(() => {
     const fetchLearning = async () => {
       try {
-        const res = await axios.get("http://localhost:9000/learning");
+        const res = await axios.get("http://localhost:9000/learn");
         setData(res.data);
       } catch (err) {
         console.error("Error fetching data", err);
