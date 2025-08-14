@@ -3,7 +3,7 @@
 import MyCard from "@/components/common/Card";
 import React from "react";
 
-export const mockUniversities = [
+const mockUniversities = [
   {
     image: "/images/uni-logo/itc-logo.png",
     title: "វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា",
