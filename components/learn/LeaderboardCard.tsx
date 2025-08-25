@@ -1,7 +1,7 @@
 "use client";
+import React from "react";
 
 import Button from "@/components/ui/button/Button";
-import React from "react";
 
 export type LeaderboardEntry = {
   rank: number;
@@ -91,8 +91,8 @@ export default function LeaderboardCard({
                 {/* Button */}
                 <td className="p-3">
                   <Button
-                    size="sm"
                     className="bg-purple-500 hover:bg-purple-600 text-white"
+                    size="sm"
                     onClick={() => onView?.(entry)}
                   >
                     View

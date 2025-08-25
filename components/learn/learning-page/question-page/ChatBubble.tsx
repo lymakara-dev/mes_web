@@ -16,9 +16,6 @@ const parseLatexSegments = (text: string) => {
   const segments: { content: string; isLatex: boolean }[] = [];
   let lastIndex = 0;
 
-  // Fixed regex:
-  // - $$...$$ matches across multiple lines
-  // - $...$ matches inline
   const regex = /(\$\$[\s\S]+?\$\$|\$(?!\$)[\s\S]+?\$)/g;
   let match;
 
@@ -61,7 +58,7 @@ export default function ChatBubble({ text, role }: ChatBubbleProps) {
             <ReactMarkdown key={i} remarkPlugins={[remarkGfm]}>
               {seg.content}
             </ReactMarkdown>
-          )
+          ),
         )}
       </div>
     </div>

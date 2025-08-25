@@ -1,4 +1,5 @@
 import type React from "react";
+
 import Link from "next/link";
 
 interface DropdownItemProps {
@@ -32,14 +33,14 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
 
   if (tag === "a" && href) {
     return (
-      <Link href={href} className={combinedClasses} onClick={handleClick}>
+      <Link className={combinedClasses} href={href} onClick={handleClick}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button onClick={handleClick} className={combinedClasses}>
+    <button className={combinedClasses} onClick={handleClick}>
       {children}
     </button>
   );

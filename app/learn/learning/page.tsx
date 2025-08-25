@@ -1,8 +1,9 @@
 "use client";
 
-import MyCard from "@/components/common/Card";
 import Link from "next/link";
 import React from "react";
+
+import MyCard from "@/components/common/Card";
 
 const mockUniversities = [
   {
@@ -48,7 +49,7 @@ export default function LearningPage() {
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4 bg-white dark:bg-gray-900 transition-colors">
       {mockUniversities.map((uni) => (
         <Link key={uni.id} href={`/learn/learning/${uni.id}`}>
-          <MyCard image={uni.image} title={uni.title} subjects={uni.subjects} />
+          <MyCard image={uni.image} subjects={uni.subjects} title={uni.title} />
         </Link>
       ))}
     </div>

@@ -27,18 +27,18 @@
     "subject": "Logic",
     "question": "Which logic gate is shown in the following diagram?",
     "questionType": "image",
-    "questionImage": "https://i.pravatar.cc/100",
+    "questionImage": "https://i.pravatar.cc/40",
     "hint": "Think about the truth table of the gate — does it output 1 only when both inputs are 1, or under different conditions?",
     "answers": [
       {
         "id": "a",
-        "content": "https://i.pravatar.cc/100",
+        "content": "https://i.pravatar.cc/40",
         "type": "image",
         "isCorrect": false
       },
       {
         "id": "b",
-        "content": "https://i.pravatar.cc/100",
+        "content": "https://i.pravatar.cc/40",
         "type": "image",
         "isCorrect": true
       },
@@ -73,7 +73,7 @@
       },
       {
         "id": "d",
-        "content": "https://i.pravatar.cc/100",
+        "content": "https://i.pravatar.cc/40",
         "type": "image",
         "isCorrect": false
       }

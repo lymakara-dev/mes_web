@@ -17,14 +17,14 @@ export default function NoteCard({ note, onDelete, onEdit }: NoteCardProps) {
       </div>
       <div className="flex justify-end gap-3 mt-4">
         <button
-          onClick={() => onEdit(note.id)}
           className="p-2 rounded-lg hover:bg-gray-100"
+          onClick={() => onEdit(note.id)}
         >
           <Edit size={18} />
         </button>
         <button
-          onClick={() => onDelete(note.id)}
           className="p-2 rounded-lg hover:bg-gray-100 text-red-500"
+          onClick={() => onDelete(note.id)}
         >
           <Trash size={18} />
         </button>

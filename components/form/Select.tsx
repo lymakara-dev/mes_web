@@ -25,8 +25,9 @@ const Select: React.FC<SelectProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
+
+    onChange(value);
     setSelectedValue(value);
-    onChange(value); // Trigger parent handler
   };
 
   return (
@@ -41,9 +42,9 @@ const Select: React.FC<SelectProps> = ({
     >
       {/* Placeholder option */}
       <option
-        value=""
         disabled
         className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
+        value=""
       >
         {placeholder}
       </option>
@@ -51,8 +52,8 @@ const Select: React.FC<SelectProps> = ({
       {options.map((option) => (
         <option
           key={option.value}
-          value={option.value}
           className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
+          value={option.value}
         >
           {option.label}
         </option>

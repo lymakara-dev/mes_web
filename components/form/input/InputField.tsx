@@ -50,17 +50,17 @@ const Input: FC<InputProps> = ({
   return (
     <div className="relative">
       <input
-        type={type}
+        className={inputClasses}
+        defaultValue={defaultValue}
+        disabled={disabled}
         id={id}
+        max={max}
+        min={min}
         name={name}
         placeholder={placeholder}
-        defaultValue={defaultValue}
-        onChange={onChange}
-        min={min}
-        max={max}
         step={step}
-        disabled={disabled}
-        className={inputClasses}
+        type={type}
+        onChange={onChange}
       />
 
       {/* Optional Hint Text */}
@@ -70,8 +70,8 @@ const Input: FC<InputProps> = ({
             error
               ? "text-error-500"
               : success
-              ? "text-success-500"
-              : "text-gray-500"
+                ? "text-success-500"
+                : "text-gray-500"
           }`}
         >
           {hint}

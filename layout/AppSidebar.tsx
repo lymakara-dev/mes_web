@@ -1,16 +1,17 @@
 "use client";
 
 import React, { useCallback } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSidebar } from "../context/SidebarContext";
 import {
   AcademicCapIcon,
   BeakerIcon,
   EllipsisHorizontalIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/solid";
+
+import { useSidebar } from "../context/SidebarContext";
 
 type NavItem = {
   name: string;
@@ -44,11 +45,11 @@ const AppSidebar: React.FC = () => {
 
   const renderMenuItems = (navItems: NavItem[]) => (
     <ul>
-      {navItems.map((nav, index) => (
+      {navItems.map((nav) => (
         <li key={nav.name}>
           <Link
-            href={nav.path}
             className={`group relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-theme-sm ${isActive(nav.path) ? "bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400" : "text-gray-700 hover:bg-gray-100 group-hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300"}`}
+            href={nav.path}
           >
             <span
               className={`${isActive(nav.path) ? "text-brand-500 dark:text-brand-400" : "text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300"}`}
@@ -89,26 +90,26 @@ const AppSidebar: React.FC = () => {
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <Image
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
                 alt="Logo"
-                width={150}
+                className="dark:hidden"
                 height={40}
+                src="/images/logo/logo.svg"
+                width={150}
               />
               <Image
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
                 alt="Logo"
-                width={150}
+                className="hidden dark:block"
                 height={40}
+                src="/images/logo/logo-dark.svg"
+                width={150}
               />
             </>
           ) : (
             <Image
-              src="/images/logo/logo-icon.svg"
               alt="Logo"
-              width={32}
               height={32}
+              src="/images/logo/logo-icon.svg"
+              width={32}
             />
           )}
         </Link>

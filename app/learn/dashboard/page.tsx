@@ -1,11 +1,11 @@
 "use client";
 
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+
 import LeaderboardCard, {
   LeaderboardEntry,
 } from "@/components/learn/LeaderboardCard";
-import { useApi } from "@/service/useApi";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
 
 const mockData: LeaderboardEntry[] = [
   {
@@ -59,18 +59,16 @@ const mockData: LeaderboardEntry[] = [
   },
 ];
 
-export default function page() {
-  const api = useApi();
-  const [data, setData] = useState<any>(null);
+export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any>(null);
 
   useEffect(() => {
     const fetchLearning = async () => {
       try {
         const res = await axios.get("http://localhost:9000/learn");
+
         setData(res.data);
-      } catch (err) {
-        console.error("Error fetching data", err);
       } finally {
         setLoading(false);
       }
@@ -83,12 +81,12 @@ export default function page() {
 
   return (
     <div>
-      {/* <pre className="text-sm text-wrap">{JSON.stringify(data, null, 2)}</pre> */}
+      <pre className="text-sm text-wrap">{JSON.stringify(data, null, 2)}</pre>
       <LeaderboardCard
-        title="Student Scores Leaderboard"
-        subtitle="Top students of the Agents Course Unit 4 Challenge"
-        loading={false}
         data={mockData}
+        loading={false}
+        subtitle="Top students of the Agents Course Unit 4 Challenge"
+        title="Student Scores Leaderboard"
         onView={(entry) => alert(`Viewing details of ${entry.username}`)}
       />
     </div>

@@ -24,8 +24,8 @@ export default function ActionButtons({
         {actions.map((a) => (
           <button
             key={a.key}
-            onClick={() => setActiveSelection(a.key)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-gray-600 hover:bg-blue-600 shrink-0 ${activeSelection === a.key ? "bg-blue-500 text-white border-blue-500" : "bg-white gray-600 hover:bg-blue-500 hover:text-white dark:bg-gray-800 dark:text-gray-300"}`}
+            onClick={() => setActiveSelection(a.key)}
           >
             {a.icon}
             <span className="text-sm">{a.label}</span>

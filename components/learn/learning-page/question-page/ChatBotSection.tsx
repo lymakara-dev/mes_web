@@ -1,7 +1,8 @@
 "use client";
 
-import { Send, Paperclip } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Send, Paperclip } from "lucide-react";
+
 import ChatBubble from "./ChatBubble";
 
 export default function ChatBotSection() {
@@ -25,6 +26,7 @@ export default function ChatBotSection() {
 
     // Add user message immediately
     const newMessages = [...messages, { role: "user" as const, text: input }];
+
     setMessages(newMessages);
     setInput("");
 
@@ -44,6 +46,7 @@ export default function ChatBotSection() {
         { role: "ai", text: data.text || "⚠️ No response" },
       ]);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Error talking to Gemini:", err);
       setMessages([
         ...newMessages,
@@ -57,24 +60,24 @@ export default function ChatBotSection() {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto space-y-4 mb-4">
         {messages.map((msg, i) => (
-          <ChatBubble key={i} text={msg.text} role={msg.role} />
+          <ChatBubble key={i} role={msg.role} text={msg.text} />
         ))}
       </div>
 
       {/* Input box */}
       <div className="flex items-center bg-white rounded-xl shadow-sm p-2 dark:bg-gray-800">
         <input
+          className="flex-1 px-2 py-2 break-all focus:outline-none text-sm dark:bg-gray-800"
+          placeholder="Type your message..."
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message..."
-          className="flex-1 px-2 py-2 break-all focus:outline-none text-sm dark:bg-gray-800"
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
         <Paperclip className="w-5 h-5 text-gray-400 cursor-pointer mr-2" />
         <button
-          onClick={sendMessage}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          onClick={sendMessage}
         >
           <Send size={16} /> <span className="max-md:hidden">Send</span>
         </button>

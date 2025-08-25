@@ -40,12 +40,12 @@ const TextArea: React.FC<TextareaProps> = ({
   return (
     <div className="relative">
       <textarea
+        className={textareaClasses}
+        disabled={disabled}
         placeholder={placeholder}
         rows={rows}
         value={value}
         onChange={handleChange}
-        disabled={disabled}
-        className={textareaClasses}
       />
       {hint && (
         <p

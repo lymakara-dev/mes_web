@@ -1,4 +1,3 @@
-// app/api/gemini/route.ts
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 
@@ -11,7 +10,7 @@ export async function POST(req: Request) {
     if (!prompt) {
       return NextResponse.json(
         { error: "Prompt is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -23,10 +22,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ text: result.text });
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
+    // console.error("Gemini API Error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch response" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

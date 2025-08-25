@@ -13,22 +13,28 @@ export function useApi() {
   return {
     getUser: async (id: number): Promise<User> => {
       const res = await api.get(`/users/${id}`);
+
       return res.data;
     },
 
     getUsers: async (): Promise<User[]> => {
       const res = await api.get("/users");
+
       return res.data;
     },
 
     createUser: async (payload: Partial<User>): Promise<User> => {
       const res = await api.post("/users", payload);
+
       return res.data;
     },
 
     Learn: async () => {
       const res = await api.get("/learning");
+
+      // eslint-disable-next-line no-console
       console.log(res);
+
       return res.data;
     },
     // Add more as needed

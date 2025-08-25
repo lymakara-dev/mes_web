@@ -9,11 +9,11 @@ interface FormProps {
 const Form: FC<FormProps> = ({ onSubmit, children, className }) => {
   return (
     <form
+      className={` ${className}`} // Default spacing between form fields
       onSubmit={(event) => {
         event.preventDefault(); // Prevent default form submission
         onSubmit(event);
       }}
-      className={` ${className}`} // Default spacing between form fields
     >
       {children}
     </form>

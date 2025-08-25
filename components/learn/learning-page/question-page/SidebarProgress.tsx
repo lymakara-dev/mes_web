@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+
 import quesitons_data from "@/data/questions.json";
 import user_quesiton_history from "@/data/user_question_history.json";
 
@@ -12,6 +13,7 @@ export default function SidebarProgress() {
   const questionsWithProgress = useMemo(() => {
     return questions.map((q) => {
       const attempt = history.find((h) => h.question_id === String(q.id));
+
       return {
         ...q,
         learned: !!attempt,

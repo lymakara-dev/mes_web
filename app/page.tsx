@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { ChartBarInteractive } from "./docs";
+import { Button } from "@heroui/button";
 import Link from "next/link";
 import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
-import { Button } from "@heroui/button";
+
+import { ChartBarInteractive } from "./docs";
 
 export default function page() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
 
   return (
     <div>

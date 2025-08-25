@@ -1,7 +1,8 @@
-import GridShape from "@/components/common/GridShape";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+
+import GridShape from "@/components/common/GridShape";
 
 export default function NotFound() {
   return (
@@ -13,18 +14,18 @@ export default function NotFound() {
         </h1>
 
         <Image
-          src="/images/error/404.svg"
           alt="404"
           className="dark:hidden"
-          width={472}
           height={152}
+          src="/images/error/404.svg"
+          width={472}
         />
         <Image
-          src="/images/error/404-dark.svg"
           alt="404"
           className="hidden dark:block"
-          width={472}
           height={152}
+          src="/images/error/404-dark.svg"
+          width={472}
         />
 
         <p className="mt-10 mb-6 text-[#06598F] dark:text-gray-400 sm:text-lg">
@@ -32,8 +33,8 @@ export default function NotFound() {
         </p>
 
         <Link
-          href="/"
           className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+          href="/"
         >
           Back to Home Page
         </Link>

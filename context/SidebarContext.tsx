@@ -18,9 +18,11 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export const useSidebar = () => {
   const context = useContext(SidebarContext);
+
   if (!context) {
     throw new Error("usesidebar must be used within a SidebarProvider");
   }
+
   return context;
 };
 
@@ -37,7 +39,9 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const handleRezise = () => {
       const mobile = window.innerWidth < 768;
+
       setIsMobile(mobile);
+
       if (!mobile) {
         setIsMobileOpen(false);
       }
@@ -45,6 +49,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
 
     handleRezise();
     window.addEventListener("resize", handleRezise);
+
     return () => {
       window.removeEventListener("resize", handleRezise);
     };
@@ -61,6 +66,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   const toggleSubmenu = (item: string) => {
     setOpenSubmenu((prev) => (prev === item ? null : item));
   };
+
   return (
     <SidebarContext.Provider
       value={{

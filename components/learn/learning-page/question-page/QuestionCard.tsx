@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Latex from "react-latex-next";
+import Image from "next/image";
+
 import { Answer, QuestionCardProps } from "@/types/question";
 import "katex/dist/katex.min.css";
-import Latex from "react-latex-next";
 
 export default function QuestionCard({ question }: QuestionCardProps) {
   const [selected, setSelected] = useState<string>("");
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [isCorect, setIsCorrect] = useState<boolean | null>(null);
 
   if (!question) return <p>Loading...</p>;
 
@@ -19,16 +21,27 @@ export default function QuestionCard({ question }: QuestionCardProps) {
     ) {
       return <Latex>{question.question}</Latex>;
     }
+
     if (question.questionType === "image") {
-      return <img src={question.questionImage!} alt="Question" />;
+      return (
+        <Image
+          alt="Question"
+          height={300}
+          src={question.questionImage!}
+          width={300}
+        />
+      );
     }
+
     return question.question;
   };
 
   // Render answer option
   const renderAnswer = (ans: Answer) => {
     if (ans.type === "latex") return <Latex>{ans.content}</Latex>;
-    if (ans.type === "image") return <img src={ans.content} alt="answer" />;
+    if (ans.type === "image")
+      return <Image alt="answer" height={100} src={ans.content} width={100} />;
+
     return ans.content;
   };
 
@@ -37,14 +50,13 @@ export default function QuestionCard({ question }: QuestionCardProps) {
   const handleSelect = (ans: Answer) => {
     setSelected(ans.id);
     setIsCorrect(ans.isCorrect);
-    console.log(ans.isCorrect);
   };
 
   return (
     <div className="bg-white dark:bg-gray-900 border border-gray-200 rounded-2xl p-4">
       <div>
         <div>{renderQuestion()}</div>
-
+        {isCorect}
         <div className="answers mt-4 flex flex-col gap-3">
           {question.answers.map((ans: any, index) => (
             <button

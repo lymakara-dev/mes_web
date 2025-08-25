@@ -1,4 +1,6 @@
 "use client";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import ActionButtons from "@/components/learn/learning-page/question-page/ActionButtons";
 import ChatBotSection from "@/components/learn/learning-page/question-page/ChatBotSection";
@@ -7,21 +9,30 @@ import Header from "@/components/learn/learning-page/question-page/Header";
 import HintSection from "@/components/learn/learning-page/question-page/HintSection";
 import ReportSection from "@/components/learn/learning-page/question-page/ReportSection";
 import SidebarProgress from "@/components/learn/learning-page/question-page/SidebarProgress";
-import { useEffect, useMemo, useRef, useState } from "react";
 import QuestionCard from "@/components/learn/learning-page/question-page/QuestionCard";
 import questionsData from "@/data/questions.json";
-import historyData from "@/data/user_question_history.json";
 import { Question } from "@/types/question";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-
-const userId = 1;
+import historyData from "@/data/user_question_history.json";
 
 export default function QuestionPage(userId: any) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  const [activeSection, setActiveSection] = useState<
+    "note" | "chatbot" | "hint" | "report"
+  >("note");
+
+  useEffect(() => {
+    const handleChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", handleChange);
+
+    return () => document.removeEventListener("fullscreenchange", handleChange);
+  }, []);
+
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [canGoNext, setCanGoNext] = useState(false);
 
   const questions: Question[] = questionsData.map((q) => ({
     ...q,
@@ -50,10 +61,6 @@ export default function QuestionPage(userId: any) {
     return <p className="p-4">🎉 You have completed all questions!</p>;
   }
 
-  const [activeSection, setActiveSection] = useState<
-    "note" | "chatbot" | "hint" | "report"
-  >("note");
-
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
       await containerRef.current?.requestFullscreen();
@@ -61,15 +68,6 @@ export default function QuestionPage(userId: any) {
       await document.exitFullscreen();
     }
   };
-
-  useEffect(() => {
-    const handleChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener("fullscreenchange", handleChange);
-    return () => document.removeEventListener("fullscreenchange", handleChange);
-  }, []);
 
   return (
     <div
@@ -88,16 +86,16 @@ export default function QuestionPage(userId: any) {
           <div className="flex justify-between mt-6">
             <button
               className="px-4 py-2 flex items-center gap-2 rounded-lg border text-gray-600 hover:bg-gray-50"
-              onClick={handlePrev}
               disabled={currentIndex === 0}
+              onClick={handlePrev}
             >
               <ArrowLeft />
               Prev
             </button>
             <button
               className="px-4 py-2 flex items-center gap-2 rounded-lg bg-blue-600 text-white hover:bg-blue-800"
-              onClick={handleNext}
               disabled={currentIndex === questions.length - 1}
+              onClick={handleNext}
             >
               Next
               <ArrowRight />

@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import NoteList from "./note-section/NoteList";
 import { Plus } from "lucide-react";
-import NoteModal from "./note-section/NoteModal";
-import { NoteInput } from "@/types/note";
 
+import NoteList from "./note-section/NoteList";
+import NoteModal from "./note-section/NoteModal";
+
+import { NoteInput } from "@/types/note";
 interface Note {
   id: number;
   title: string;
@@ -27,6 +28,7 @@ export default function NoteSection() {
 
   const handleEdit = (id: number) => {
     const note = notes.find((n) => n.id === id) || null;
+
     setSelectedNote(note);
     setIsModalOpen(true);
   };
@@ -40,7 +42,7 @@ export default function NoteSection() {
     if (note.id) {
       // Editing existing
       setNotes((prev) =>
-        prev.map((n) => (n.id === note.id ? { ...n, ...note } : n))
+        prev.map((n) => (n.id === note.id ? { ...n, ...note } : n)),
       );
     } else {
       // Creating new
@@ -49,6 +51,7 @@ export default function NoteSection() {
         title: note.title,
         content: note.content,
       };
+
       setNotes((prev) => [...prev, newNote]);
     }
   };
@@ -62,21 +65,21 @@ export default function NoteSection() {
 
       {/* Floating Plus Button */}
       <button
-        onClick={handleAdd}
         className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700"
+        onClick={handleAdd}
       >
         <Plus className="w-6 h-6" />
       </button>
 
       {/* Note Modal (for add & edit) */}
       <NoteModal
+        initialNote={selectedNote}
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
           setSelectedNote(null);
         }}
         onSave={handleSave}
-        initialNote={selectedNote}
       />
     </div>
   );

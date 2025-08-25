@@ -19,13 +19,13 @@ export default function Header({
       <div className="flex items-center">
         {isFullscreen ? (
           <Minimize
-            onClick={onToggleFullscreen}
             className="w-5 h-5 text-gray-500 cursor-pointer dark:text-white/90"
+            onClick={onToggleFullscreen}
           />
         ) : (
           <Maximize
-            onClick={onToggleFullscreen}
             className="w-5 h-5 text-gray-500 cursor-pointer dark:text-white/90"
+            onClick={onToggleFullscreen}
           />
         )}
       </div>

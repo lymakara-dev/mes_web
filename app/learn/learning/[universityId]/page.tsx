@@ -1,6 +1,7 @@
-import SubjectCard from "@/components/learn/learning-page/SubjectCard";
 import Link from "next/link";
 import React from "react";
+
+import SubjectCard from "@/components/learn/learning-page/SubjectCard";
 
 const subjects = [
   {
@@ -38,12 +39,12 @@ const subjects = [
 ];
 
 interface SubjectPageProps {
-  params: { universityId: string };
+  params: Promise<{ universityId: string }>;
 }
 
-export default function SubjectPage({ params }: SubjectPageProps) {
-  const { universityId } = params;
-  console.log("uni id: ", universityId);
+export default async function SubjectPage({ params }: SubjectPageProps) {
+  const { universityId } = await params;
+
   return (
     <div>
       {subjects.map((subject) => (
@@ -52,11 +53,11 @@ export default function SubjectPage({ params }: SubjectPageProps) {
           href={`/learn/learning/${universityId}/${subject.id}`}
         >
           <SubjectCard
-            title={subject.title}
-            questions={subject.questions}
-            progress={subject.progress}
-            image={subject.image}
             buttonLabel={subject.buttonLabel}
+            image={subject.image}
+            progress={subject.progress}
+            questions={subject.questions}
+            title={subject.title}
           />
         </Link>
       ))}

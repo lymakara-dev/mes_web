@@ -1,9 +1,10 @@
 "use client";
 
+import React from "react";
+
 import { useSidebar } from "@/context/SidebarContext";
 import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
-import React from "react";
 
 export default function LearningLayout({
   children,
@@ -18,6 +19,7 @@ export default function LearningLayout({
     : isExpanded || isHovered
       ? "lg:ml-[290px]"
       : "lg:ml-[90px]";
+
   return (
     <div className="min-h-screen xl:flex">
       {/* Sidebar and Backdrop */}

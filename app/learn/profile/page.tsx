@@ -1,8 +1,9 @@
 "use client";
 
+import React from "react";
+
 import ProfileCard from "@/components/learn/user-profile/ProfileTable";
 import UserMetaCard from "@/components/learn/user-profile/UserMetaCard";
-import React from "react";
 
 export default function Profile() {
   const [user, setUser] = React.useState({
@@ -24,27 +25,27 @@ export default function Profile() {
     gender?: string;
   }) => {
     setUser({ ...user, ...updatedUser });
-    console.log("Saved user:", updatedUser);
+    // console.log("Saved user:", updatedUser);
   };
 
   return (
     <div className="flex flex-col gap-5">
       <UserMetaCard
         avatarUrl={user.avatarUrl}
+        email={user.email}
         firstName={user.firstName}
         lastName={user.lastName}
-        userName={user.userName}
-        role={user.role}
-        email={user.email}
         phone={user.phone}
+        role={user.role}
+        userName={user.userName}
         onSave={handleSave}
       />
 
       <ProfileCard
+        email={user.email}
         fullName={`${user.lastName} ${user.firstName}`}
         gender="ប្រុស"
         phone={user.phone}
-        email={user.email}
       />
     </div>
   );

@@ -1,10 +1,10 @@
 "use client";
 
-import Button from "@/components/ui/button/Button";
-import { Progress } from "@heroui/react";
-import { visualElementStore } from "framer-motion";
 import Image from "next/image";
 import React from "react";
+import { Progress } from "@heroui/react";
+
+import Button from "@/components/ui/button/Button";
 
 interface SubjectCardProps {
   title: string;
@@ -26,11 +26,11 @@ export default function SubjectCard({
       {/* Subject Image */}
       <div className="items-center w-full rounded-full max-w-24">
         <Image
-          width={48}
-          height={48}
-          src={image}
           alt={title}
           className="w-full"
+          height={48}
+          src={image}
+          width={48}
         />
       </div>
 
@@ -64,7 +64,7 @@ export default function SubjectCard({
 
       {/* Action Button */}
       <div>
-        <Button variant="outline" size="sm" className="w-20">
+        <Button className="w-20" size="sm" variant="outline">
           {buttonLabel}
         </Button>
       </div>
