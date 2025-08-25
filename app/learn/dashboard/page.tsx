@@ -83,7 +83,7 @@ export default function page() {
 
   return (
     <div>
-      <pre className="text-sm text-wrap">{JSON.stringify(data, null, 2)}</pre>
+      {/* <pre className="text-sm text-wrap">{JSON.stringify(data, null, 2)}</pre> */}
       <LeaderboardCard
         title="Student Scores Leaderboard"
         subtitle="Top students of the Agents Course Unit 4 Challenge"
