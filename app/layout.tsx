@@ -1,13 +1,11 @@
 import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";
-import { Link } from "@heroui/link";
 import clsx from "clsx";
 
 import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
-import { Navbar } from "@/components/navbar";
 import APIProviders from "./api-provider";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { ThemeProvider } from "@/context/ThemeContext";
@@ -53,7 +51,9 @@ export default function RootLayout({
                   {/* <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">s
                 {children}
               </main> */}
-                  <main className="w-screen mx-auto flex-grow">{children}</main>
+                  <main className="w-screen mx-auto flex-grow overflow-x-hidden">
+                    {children}
+                  </main>
                   {/* <footer className="w-full flex items-center justify-center py-3">
                     <Link
                       isExternal

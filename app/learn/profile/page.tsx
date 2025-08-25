@@ -1,21 +1,51 @@
-import { Metadata } from "next";
+"use client";
+
+import ProfileCard from "@/components/learn/user-profile/ProfileTable";
+import UserMetaCard from "@/components/learn/user-profile/UserMetaCard";
 import React from "react";
 
-export const metadata: Metadata = {
-  title: "Next.js Profile | TailAdmin - Next.js Dashboard Template",
-  description:
-    "This is Next.js Profile page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
-};
-
 export default function Profile() {
+  const [user, setUser] = React.useState({
+    avatarUrl: "https://i.pravatar.cc/40",
+    firstName: "មករា",
+    lastName: "លី",
+    userName: "lymakara07",
+    role: "អភិបាលប្រព័ន្ធ",
+    email: "lymakara123@gmail.com",
+    phone: "089251867",
+  });
+
+  const handleSave = (updatedUser: {
+    firstName: string;
+    lastName: string;
+    userName: string;
+    email: string;
+    phone: string;
+    gender?: string;
+  }) => {
+    setUser({ ...user, ...updatedUser });
+    console.log("Saved user:", updatedUser);
+  };
+
   return (
-    <div>
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
-          Profile
-        </h3>
-        <div className="space-y-6">ME</div>
-      </div>
+    <div className="flex flex-col gap-5">
+      <UserMetaCard
+        avatarUrl={user.avatarUrl}
+        firstName={user.firstName}
+        lastName={user.lastName}
+        userName={user.userName}
+        role={user.role}
+        email={user.email}
+        phone={user.phone}
+        onSave={handleSave}
+      />
+
+      <ProfileCard
+        fullName={`${user.lastName} ${user.firstName}`}
+        gender="ប្រុស"
+        phone={user.phone}
+        email={user.email}
+      />
     </div>
   );
 }

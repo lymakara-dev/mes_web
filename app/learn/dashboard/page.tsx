@@ -1,9 +1,63 @@
 "use client";
 
-import RecentOrders from "@/components/learn/RecentOrders";
+import LeaderboardCard, {
+  LeaderboardEntry,
+} from "@/components/learn/LeaderboardCard";
 import { useApi } from "@/service/useApi";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+
+const mockData: LeaderboardEntry[] = [
+  {
+    rank: 1,
+    username: "hakeny1712",
+    score: 100,
+    timestamp: "2025-04-29 05:45:28",
+  },
+  { rank: 2, username: "tal0312", score: 98, timestamp: "2025-04-29 15:32:51" },
+  {
+    rank: 3,
+    username: "fisherman611",
+    score: 95,
+    timestamp: "2025-04-30 13:06:27",
+  },
+  {
+    rank: 4,
+    username: "ZeroTimo",
+    score: 92,
+    timestamp: "2025-04-30 14:27:56",
+  },
+  {
+    rank: 5,
+    username: "ZeroTimo",
+    score: 92,
+    timestamp: "2025-04-30 14:27:56",
+  },
+  {
+    rank: 6,
+    username: "ZeroTimo",
+    score: 92,
+    timestamp: "2025-04-30 14:27:56",
+  },
+  {
+    rank: 7,
+    username: "ZeroTimo",
+    score: 92,
+    timestamp: "2025-04-30 14:27:56",
+  },
+  {
+    rank: 8,
+    username: "ZeroTimo",
+    score: 92,
+    timestamp: "2025-04-30 14:27:56",
+  },
+  {
+    rank: 9,
+    username: "ZeroTimo",
+    score: 92,
+    timestamp: "2025-04-30 14:27:56",
+  },
+];
 
 export default function page() {
   const api = useApi();
@@ -29,8 +83,14 @@ export default function page() {
 
   return (
     <div>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-      <RecentOrders />
+      <pre className="text-sm text-wrap">{JSON.stringify(data, null, 2)}</pre>
+      <LeaderboardCard
+        title="Student Scores Leaderboard"
+        subtitle="Top students of the Agents Course Unit 4 Challenge"
+        loading={false}
+        data={mockData}
+        onView={(entry) => alert(`Viewing details of ${entry.username}`)}
+      />
     </div>
   );
 }

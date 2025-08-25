@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "subject": "Mathematics",
+    "question": "Solve for x: $$2x^2 + 3x - 2 = 0$$",
+    "questionType": "latex",
+    "hint": "Try using the quadratic formula: $$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$.",
+    "answers": [
+      {
+        "id": "a",
+        "content": "$$x = \\frac{-3 + \\sqrt{17}}{4}$$",
+        "type": "latex",
+        "isCorrect": true
+      },
+      {
+        "id": "b",
+        "content": "$$x = \\frac{-3 - \\sqrt{17}}{4}$$",
+        "type": "latex",
+        "isCorrect": true
+      },
+      { "id": "c", "content": "x = 2", "type": "text", "isCorrect": false },
+      { "id": "d", "content": "x = -2", "type": "text", "isCorrect": false }
+    ]
+  },
+  {
+    "id": 2,
+    "subject": "Logic",
+    "question": "Which logic gate is shown in the following diagram?",
+    "questionType": "image",
+    "questionImage": "https://i.pravatar.cc/100",
+    "hint": "Think about the truth table of the gate — does it output 1 only when both inputs are 1, or under different conditions?",
+    "answers": [
+      {
+        "id": "a",
+        "content": "https://i.pravatar.cc/100",
+        "type": "image",
+        "isCorrect": false
+      },
+      {
+        "id": "b",
+        "content": "https://i.pravatar.cc/100",
+        "type": "image",
+        "isCorrect": true
+      },
+      { "id": "c", "content": "XOR Gate", "type": "text", "isCorrect": false },
+      { "id": "d", "content": "NAND Gate", "type": "text", "isCorrect": false }
+    ]
+  },
+  {
+    "id": 3,
+    "subject": "Physics",
+    "question": "The equation for kinetic energy is: $E_k = \\frac{1}{2}mv^2$",
+    "questionType": "mixed",
+    "hint": "Kinetic energy relates to motion — recall which form of energy depends on velocity.",
+    "answers": [
+      {
+        "id": "a",
+        "content": "Kinetic Energy",
+        "type": "text",
+        "isCorrect": true
+      },
+      {
+        "id": "b",
+        "content": "Potential Energy",
+        "type": "text",
+        "isCorrect": false
+      },
+      {
+        "id": "c",
+        "content": "$$E_p = mgh$$",
+        "type": "latex",
+        "isCorrect": false
+      },
+      {
+        "id": "d",
+        "content": "https://i.pravatar.cc/100",
+        "type": "image",
+        "isCorrect": false
+      }
+    ]
+  }
+]

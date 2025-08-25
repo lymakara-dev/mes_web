@@ -20,18 +20,18 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    icon: <BeakerIcon className="w-5 h-5" />,
-    name: "Dashboard",
+    icon: <BeakerIcon className="w-6 h-6" />,
+    name: "ផ្ទាំងព័ត៌មាន",
     path: "/learn/dashboard",
   },
   {
-    icon: <AcademicCapIcon className="w-5 h-5" />,
-    name: "Learning",
+    icon: <AcademicCapIcon className="w-6 h-6" />,
+    name: "ការសិក្សា",
     path: "/learn/learning",
   },
   {
-    icon: <UserCircleIcon className="w-5 h-5" />,
-    name: "User Profile",
+    icon: <UserCircleIcon className="w-6 h-6" />,
+    name: "គណនី",
     path: "/learn/profile",
   },
 ];

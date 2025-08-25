@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "user_id": "1",
+    "question_id": "1",
+    "answered_at": "2025-08-23T10:15:30Z",
+    "is_correct": true,
+    "time_taken": 12
+  },
+  {
+    "id": "2",
+    "user_id": "1",
+    "question_id": "2",
+    "answered_at": "2025-08-23T10:15:32Z",
+    "is_correct": true,
+    "time_taken": 9
+  },
+  {
+    "id": "3",
+    "user_id": "1",
+    "question_id": "",
+    "answered_at": "2025-08-23T10:15:34Z",
+    "is_correct": true,
+    "time_taken": 10
+  }
+]
