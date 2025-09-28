@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
 
 import MyCard from "@/components/common/Card";
+import { useApi } from "@/service/useApi";
+import { useQuery } from "@tanstack/react-query";
+import { School } from "@/types/school";
 
 const mockUniversities = [
   {
@@ -45,11 +47,21 @@ const mockUniversities = [
 ];
 
 export default function LearningPage() {
+  const { getSchools } = useApi();
+
+  const { data, isLoading, isError } = useQuery<School[]>({
+    queryKey: ["schools"],
+    queryFn: getSchools,
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Failed to load schools</p>;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4 bg-white dark:bg-gray-900 transition-colors">
-      {mockUniversities.map((uni) => (
-        <Link key={uni.id} href={`/learn/learning/${uni.id}`}>
-          <MyCard image={uni.image} subjects={uni.subjects} title={uni.title} />
+      {data?.map((s) => (
+        <Link key={s.id} href={`/learn/learning/${s.id}`}>
+          <MyCard image={s.logoUrl} subjects={s.subjectCount} title={s.name} />
         </Link>
       ))}
     </div>

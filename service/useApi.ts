@@ -1,6 +1,10 @@
 // hooks/useApi.ts
 
+import { School } from "@/types/school";
 import api from "./api";
+import { Subject } from "@/types/subject";
+import { QuestionAnswer } from "@/types/question-answer";
+import { AwardIcon } from "lucide-react";
 
 // --- Types
 export type User = {
@@ -29,11 +33,20 @@ export function useApi() {
       return res.data;
     },
 
-    Learn: async () => {
-      const res = await api.get("/learning");
+    getSchools: async (): Promise<School[]> => {
+      const res = await api.get("/schools");
 
-      // eslint-disable-next-line no-console
-      console.log(res);
+      return res.data;
+    },
+
+    getSubject: async (id: string): Promise<Subject[]> => {
+      const res = await api.get(`/subjects/school?schoolId=${id}`);
+
+      return res.data;
+    },
+
+    getQuestionBySubjectId: async (id: string): Promise<QuestionAnswer[]> => {
+      const res = await api.get(`/questions/subject?subjectId=${id}`);
 
       return res.data;
     },

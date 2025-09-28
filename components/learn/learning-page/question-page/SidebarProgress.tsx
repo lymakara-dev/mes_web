@@ -2,11 +2,14 @@
 
 import { useMemo, useState } from "react";
 
-import quesitons_data from "@/data/questions.json";
 import user_quesiton_history from "@/data/user_question_history.json";
+import { QuestionAnswer } from "@/types/question-answer";
 
-export default function SidebarProgress() {
-  const [questions] = useState(quesitons_data);
+type SidebarProgressProps = {
+  questions: QuestionAnswer[];
+};
+
+export default function SidebarProgress({ questions }: SidebarProgressProps) {
   const [history] = useState(user_quesiton_history);
 
   // merge progress
@@ -63,10 +66,10 @@ export default function SidebarProgress() {
                 }`}
               >
                 {q.learned ? "✓" : ""}
-              </div>
+              </div> 
             </div>
             <span>
-              Q{q.id}: {q.subject}
+              Q{q.id}: {q.content}
             </span>
           </div>
         ))}

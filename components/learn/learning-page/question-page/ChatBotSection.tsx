@@ -9,8 +9,8 @@ export default function ChatBotSection() {
   const [messages, setMessages] = useState<
     { role: "user" | "ai"; text: string }[]
   >([{ role: "ai", text: "Hi, how can I help you today?" }]);
-
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = () => {
@@ -19,19 +19,18 @@ export default function ChatBotSection() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, loading]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
     // Add user message immediately
     const newMessages = [...messages, { role: "user" as const, text: input }];
-
     setMessages(newMessages);
     setInput("");
+    setLoading(true); // start loading
 
     try {
-      // Send request to API route
       const res = await fetch("/api/gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -46,12 +45,13 @@ export default function ChatBotSection() {
         { role: "ai", text: data.text || "⚠️ No response" },
       ]);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("Error talking to Gemini:", err);
       setMessages([
         ...newMessages,
         { role: "ai", text: "⚠️ Error: could not get response" },
       ]);
+    } finally {
+      setLoading(false); // stop loading
     }
   };
 
@@ -62,6 +62,11 @@ export default function ChatBotSection() {
         {messages.map((msg, i) => (
           <ChatBubble key={i} role={msg.role} text={msg.text} />
         ))}
+
+        {/* Loading indicator */}
+        {loading && <div className="text-gray-500 italic">AI is typing...</div>}
+
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input box */}
@@ -73,11 +78,13 @@ export default function ChatBotSection() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          disabled={loading} // disable input while waiting
         />
         <Paperclip className="w-5 h-5 text-gray-400 cursor-pointer mr-2" />
         <button
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
           onClick={sendMessage}
+          disabled={loading} // prevent multiple sends
         >
           <Send size={16} /> <span className="max-md:hidden">Send</span>
         </button>

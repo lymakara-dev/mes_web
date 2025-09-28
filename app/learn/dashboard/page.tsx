@@ -66,9 +66,9 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchLearning = async () => {
       try {
-        const res = await axios.get("http://localhost:9000/learn");
+        const res = await axios.get("http://localhost:3000/api");
 
-        setData(res.data);
+        setData(res.data.message);
       } finally {
         setLoading(false);
       }

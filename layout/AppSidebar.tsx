@@ -95,6 +95,7 @@ const AppSidebar: React.FC = () => {
                 height={40}
                 src="/images/logo/logo.svg"
                 width={150}
+                priority
               />
               <Image
                 alt="Logo"
@@ -102,6 +103,7 @@ const AppSidebar: React.FC = () => {
                 height={40}
                 src="/images/logo/logo-dark.svg"
                 width={150}
+                priority
               />
             </>
           ) : (
@@ -110,6 +112,7 @@ const AppSidebar: React.FC = () => {
               height={32}
               src="/images/logo/logo-icon.svg"
               width={32}
+              priority
             />
           )}
         </Link>

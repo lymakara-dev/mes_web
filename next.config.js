@@ -7,6 +7,12 @@ const nextConfig = {
         hostname: "i.pravatar.cc",
         pathname: "/40/**",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "9000",
+        pathname: "/learn-bucket/**",
+      },
     ],
   },
 };

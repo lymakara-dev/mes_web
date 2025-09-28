@@ -31,6 +31,7 @@ export default function SubjectCard({
           height={48}
           src={image}
           width={48}
+          priority
         />
       </div>
 

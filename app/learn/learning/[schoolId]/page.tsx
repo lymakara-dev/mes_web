@@ -1,7 +1,11 @@
-import Link from "next/link";
-import React from "react";
+"use client";
 
 import SubjectCard from "@/components/learn/learning-page/SubjectCard";
+import { useApi } from "@/service/useApi";
+import { Subject } from "@/types/subject";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 const subjects = [
   {
@@ -38,26 +42,33 @@ const subjects = [
   },
 ];
 
-interface SubjectPageProps {
-  params: Promise<{ universityId: string }>;
-}
+export default function SubjectPage() {
+  const params = useParams();
+  const schoolId = params?.schoolId;
 
-export default async function SubjectPage({ params }: SubjectPageProps) {
-  const { universityId } = await params;
+  const { getSubject } = useApi();
+
+  const { data, isLoading, isError } = useQuery<Subject[]>({
+    queryKey: ["subjects", schoolId],
+    queryFn: () => getSubject(schoolId as string),
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Fail to load subjects</p>;
 
   return (
     <div>
-      {subjects.map((subject) => (
+      {data?.map((subject) => (
         <Link
           key={subject.id}
-          href={`/learn/learning/${universityId}/${subject.id}`}
+          href={`/learn/learning/${schoolId}/${subject.id}`}
         >
           <SubjectCard
-            buttonLabel={subject.buttonLabel}
-            image={subject.image}
-            progress={subject.progress}
-            questions={subject.questions}
-            title={subject.title}
+            buttonLabel={"ចាប់ផ្ដើម"}
+            image={subject.logoUrl}
+            progress={10}
+            questions={subject.questionCount}
+            title={subject.name}
           />
         </Link>
       ))}

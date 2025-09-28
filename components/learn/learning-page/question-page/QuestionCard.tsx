@@ -4,42 +4,39 @@ import { useState } from "react";
 import Latex from "react-latex-next";
 import Image from "next/image";
 
-import { Answer, QuestionCardProps } from "@/types/question";
 import "katex/dist/katex.min.css";
+import { Answer, QuestionCardProps } from "@/types/question-answer";
 
 export default function QuestionCard({ question }: QuestionCardProps) {
-  const [selected, setSelected] = useState<string>("");
+  const [selected, setSelected] = useState<number>();
   const [isCorect, setIsCorrect] = useState<boolean | null>(null);
 
   if (!question) return <p>Loading...</p>;
 
   // Render question
   const renderQuestion = () => {
-    if (
-      question.questionType === "latex" ||
-      question.questionType === "mixed"
-    ) {
-      return <Latex>{question.question}</Latex>;
+    if (question.contentType === "latex") {
+      return <Latex>{`$$${question.content}$$`}</Latex>;
     }
 
-    if (question.questionType === "image") {
+    if (question.contentType === "image") {
       return (
         <Image
           alt="Question"
           height={300}
-          src={question.questionImage!}
+          src={question.content!}
           width={300}
         />
       );
     }
 
-    return question.question;
+    return question.content;
   };
 
   // Render answer option
   const renderAnswer = (ans: Answer) => {
-    if (ans.type === "latex") return <Latex>{ans.content}</Latex>;
-    if (ans.type === "image")
+    if (ans.contentType === "latex") return <Latex>{ans.content}</Latex>;
+    if (ans.contentType === "image")
       return <Image alt="answer" height={100} src={ans.content} width={100} />;
 
     return ans.content;
