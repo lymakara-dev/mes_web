@@ -53,6 +53,8 @@ export default function SubjectPage() {
     queryFn: () => getSubject(schoolId as string),
   });
 
+  console.log("subject ser progress", data);
+
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Fail to load subjects</p>;
 
@@ -66,7 +68,7 @@ export default function SubjectPage() {
           <SubjectCard
             buttonLabel={"ចាប់ផ្ដើម"}
             image={subject.logoUrl}
-            progress={10}
+            progress={subject.userProgress}
             questions={subject.questionCount}
             title={subject.name}
           />

@@ -15,22 +15,28 @@ export default function QuestionCard({ question }: QuestionCardProps) {
 
   // Render question
   const renderQuestion = () => {
-    if (question.contentType === "latex") {
-      return <Latex>{`$$${question.content}$$`}</Latex>;
+    switch (question.contentType) {
+      case "latex":
+        return <Latex>{`$$${question.content}$$`}</Latex>;
+      case "image":
+        return (
+          <Image
+            alt="Question"
+            height={300}
+            src={question.content!}
+            width={300}
+          />
+        );
+      case "video":
+        return (
+          <video controls className="w-full max-h-[400px] rounded">
+            <source src={question.content} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        );
+      default:
+        return question.content;
     }
-
-    if (question.contentType === "image") {
-      return (
-        <Image
-          alt="Question"
-          height={300}
-          src={question.content!}
-          width={300}
-        />
-      );
-    }
-
-    return question.content;
   };
 
   // Render answer option

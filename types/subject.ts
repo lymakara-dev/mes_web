@@ -4,4 +4,5 @@ export type Subject = {
   name: string;
   logoUrl: string;
   questionCount: number;
+  userProgress: number;
 };

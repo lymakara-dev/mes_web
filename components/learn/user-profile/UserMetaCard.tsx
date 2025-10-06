@@ -13,7 +13,7 @@ type UserMetaCardProps = {
   avatarUrl: string;
   firstName: string;
   lastName: string;
-  userName: string;
+  username: string;
   role: string;
   email: string;
   phone: string;
@@ -22,7 +22,7 @@ type UserMetaCardProps = {
   onSave?: (updatedUser: {
     firstName: string;
     lastName: string;
-    userName: string;
+    username: string;
     email: string;
     phone: string;
     gender?: string;
@@ -33,7 +33,7 @@ export default function UserMetaCard({
   avatarUrl,
   firstName,
   lastName,
-  userName,
+  username,
   gender,
   role,
   email,
@@ -49,7 +49,7 @@ export default function UserMetaCard({
   const [formData, setFormData] = useState({
     firstName,
     lastName,
-    userName,
+    username,
     email,
     phone,
     gender,
@@ -67,7 +67,7 @@ export default function UserMetaCard({
   const fields = [
     { key: "firstName", label: "First Name", type: "text" },
     { key: "lastName", label: "Last Name", type: "text" },
-    { key: "userName", label: "Username", type: "text" },
+    { key: "username", label: "Username", type: "text" },
     { key: "email", label: "Email Address", type: "email" },
     { key: "phone", label: "Phone", type: "text" },
   ];
@@ -80,7 +80,12 @@ export default function UserMetaCard({
             {/* Avatar + Info */}
             <div className="flex flex-row max-xl:flex-col items-center gap-5">
               <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
-                <Image alt="user" height={80} src={avatarUrl} width={80} />
+                <Image
+                  alt="user"
+                  height={80}
+                  src={avatarUrl || "/default-avatar.png"}
+                  width={80}
+                />
               </div>
               <div>
                 <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">

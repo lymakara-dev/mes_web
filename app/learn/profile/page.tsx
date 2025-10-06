@@ -1,51 +1,63 @@
 "use client";
 
-import React from "react";
-
 import ProfileCard from "@/components/learn/user-profile/ProfileTable";
 import UserMetaCard from "@/components/learn/user-profile/UserMetaCard";
+import api from "@/service/api";
+import { useApi } from "@/service/useApi";
+import { User } from "@/types/user";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function Profile() {
-  const [user, setUser] = React.useState({
-    avatarUrl: "https://i.pravatar.cc/40",
-    firstName: "មករា",
-    lastName: "លី",
-    userName: "lymakara07",
-    role: "អភិបាលប្រព័ន្ធ",
-    email: "lymakara123@gmail.com",
-    phone: "089251867",
+  const { getProfile, updateProfile } = useApi();
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, isError } = useQuery<User>({
+    queryKey: ["getProfile"],
+    queryFn: getProfile,
+  });
+
+  console.log("user info page", data);
+
+  const mutation = useMutation({
+    mutationFn: updateProfile,
+    onSuccess: () => {
+      // Refetch the profile after successful update
+      queryClient.invalidateQueries({ queryKey: ["getProfile"] });
+    },
+    onError: (error) => {
+      console.error("Failed to update profile:", error);
+    },
   });
 
   const handleSave = (updatedUser: {
+    username: string;
     firstName: string;
     lastName: string;
-    userName: string;
     email: string;
     phone: string;
     gender?: string;
   }) => {
-    setUser({ ...user, ...updatedUser });
-    // console.log("Saved user:", updatedUser);
+    mutation.mutate(updatedUser);
   };
 
   return (
     <div className="flex flex-col gap-5">
       <UserMetaCard
-        avatarUrl={user.avatarUrl}
-        email={user.email}
-        firstName={user.firstName}
-        lastName={user.lastName}
-        phone={user.phone}
-        role={user.role}
-        userName={user.userName}
+        avatarUrl={data?.userInfo?.imageUrl || ""}
+        email={data?.userInfo?.email || ""}
+        firstName={data?.userInfo?.firstname || ""}
+        lastName={data?.userInfo?.lastname || ""}
+        phone={data?.userInfo?.phone || ""}
+        role={data?.role || ""}
+        username={data?.username || ""}
         onSave={handleSave}
       />
 
       <ProfileCard
-        email={user.email}
-        fullName={`${user.lastName} ${user.firstName}`}
-        gender="ប្រុស"
-        phone={user.phone}
+        email={data?.userInfo?.email || ""}
+        fullName={`${data?.userInfo?.lastname || ""} ${data?.userInfo?.firstname || ""}`}
+        gender={data?.userInfo?.gender || ""}
+        phone={data?.userInfo?.phone || ""}
       />
     </div>
   );

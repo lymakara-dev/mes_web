@@ -5,9 +5,18 @@ import Link from "next/link";
 
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import { useApi } from "@/service/useApi";
+import { useQuery } from "@tanstack/react-query";
+import { User } from "@/types/user";
 
 export default function UserDropdown() {
+  const { getProfile } = useApi();
   const [isOpen, setIsOpen] = useState(false);
+
+  const { data, isLoading, isError } = useQuery<User>({
+    queryKey: ["getProfile"],
+    queryFn: getProfile,
+  });
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
@@ -28,7 +37,7 @@ export default function UserDropdown() {
           <Image
             alt="User"
             height={44}
-            src="https://i.pravatar.cc/40"
+            src={data?.userInfo?.imageUrl || ""}
             width={44}
           />
         </span>
@@ -62,10 +71,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            លី​ មករា
+            {`${data?.userInfo?.lastname || ""} ${data?.userInfo?.firstname || ""} `}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            lymakara123@gmail.com
+            {data?.userInfo?.email || ""}
           </span>
         </div>
 
@@ -95,7 +104,7 @@ export default function UserDropdown() {
               Edit profile
             </DropdownItem>
           </li>
-          <li>
+          {/* <li>
             <DropdownItem
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
               href="/profile"
@@ -144,11 +153,11 @@ export default function UserDropdown() {
               </svg>
               Support
             </DropdownItem>
-          </li>
+          </li> */}
         </ul>
         <Link
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-          href="/signin"
+          href="/learn/signin"
         >
           <svg
             className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300"

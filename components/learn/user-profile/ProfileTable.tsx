@@ -1,6 +1,8 @@
 "use client";
 
-import React from "react";
+import { useApi } from "@/service/useApi";
+import { User } from "@/types/user";
+import React, { useEffect, useState } from "react";
 
 type ProfileCardProps = {
   fullName: string;
