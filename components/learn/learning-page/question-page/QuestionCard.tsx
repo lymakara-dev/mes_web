@@ -16,9 +16,9 @@ export default function QuestionCard({ question }: QuestionCardProps) {
   // Render question
   const renderQuestion = () => {
     switch (question.contentType) {
-      case "latex":
+      case "LATEX":
         return <Latex>{`$$${question.content}$$`}</Latex>;
-      case "image":
+      case "IMAGE":
         return (
           <Image
             alt="Question"
@@ -27,7 +27,7 @@ export default function QuestionCard({ question }: QuestionCardProps) {
             width={300}
           />
         );
-      case "video":
+      case "VIDEO":
         return (
           <video controls className="w-full max-h-[400px] rounded">
             <source src={question.content} type="video/mp4" />
@@ -41,8 +41,8 @@ export default function QuestionCard({ question }: QuestionCardProps) {
 
   // Render answer option
   const renderAnswer = (ans: Answer) => {
-    if (ans.contentType === "latex") return <Latex>{ans.content}</Latex>;
-    if (ans.contentType === "image")
+    if (ans.contentType === "LATEX") return <Latex>{ans.content}</Latex>;
+    if (ans.contentType === "IMAGE")
       return <Image alt="answer" height={100} src={ans.content} width={100} />;
 
     return ans.content;

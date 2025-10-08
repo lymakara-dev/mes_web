@@ -4,8 +4,7 @@ import SubjectCard from "@/components/learn/learning-page/SubjectCard";
 import { useApi } from "@/service/useApi";
 import { Subject } from "@/types/subject";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 const subjects = [
   {
@@ -45,34 +44,47 @@ const subjects = [
 export default function SubjectPage() {
   const params = useParams();
   const schoolId = params?.schoolId;
+  const router = useRouter();
 
-  const { getSubject } = useApi();
+  const { getSubjectsWithProgress, startLearning } = useApi();
 
+  // const { data, isLoading, isError } = useQuery<Subject[]>({
+  //   queryKey: ["subjects", schoolId],
+  //   queryFn: () => getSubject(schoolId as string),
+  // });
   const { data, isLoading, isError } = useQuery<Subject[]>({
-    queryKey: ["subjects", schoolId],
-    queryFn: () => getSubject(schoolId as string),
+    queryKey: ["progress"],
+    queryFn: getSubjectsWithProgress,
   });
 
-  console.log("subject ser progress", data);
+  console.log("subject user progress", data);
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Fail to load subjects</p>;
 
+  const handleStartLearning = async (subjectId: number) => {
+    try {
+      await startLearning(subjectId); // call backend to initialize progress
+      console.log("start", await startLearning(subjectId));
+      router.push(`/learn/learning/${schoolId}/${subjectId}`); // navigate to question page
+    } catch (err) {
+      console.error("Failed to start learning:", err);
+    }
+  };
+
   return (
     <div>
       {data?.map((subject) => (
-        <Link
-          key={subject.id}
-          href={`/learn/learning/${schoolId}/${subject.id}`}
-        >
+        <div key={subject.id}>
           <SubjectCard
             buttonLabel={"ចាប់ផ្ដើម"}
             image={subject.logoUrl}
             progress={subject.userProgress}
             questions={subject.questionCount}
             title={subject.name}
+            onClickButton={() => handleStartLearning(subject.id)}
           />
-        </Link>
+        </div>
       ))}
     </div>
   );

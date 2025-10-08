@@ -12,6 +12,7 @@ interface SubjectCardProps {
   progress: number;
   image: string;
   buttonLabel?: string;
+  onClickButton?: () => void;
 }
 
 export default function SubjectCard({
@@ -20,6 +21,7 @@ export default function SubjectCard({
   progress,
   image,
   buttonLabel = "ចាប់ផ្ដើម",
+  onClickButton,
 }: SubjectCardProps) {
   return (
     <div className="flex items-center justify-between gap-3 p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
@@ -65,7 +67,12 @@ export default function SubjectCard({
 
       {/* Action Button */}
       <div>
-        <Button className="w-20" size="sm" variant="outline">
+        <Button
+          onClick={onClickButton}
+          className="w-20"
+          size="sm"
+          variant="outline"
+        >
           {buttonLabel}
         </Button>
       </div>

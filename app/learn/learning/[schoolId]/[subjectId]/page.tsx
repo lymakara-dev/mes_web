@@ -8,12 +8,14 @@ import QuestionSections from "@/components/learn/learning-page/question-page/Que
 import SidebarProgress from "@/components/learn/learning-page/question-page/SidebarProgress";
 import Header from "@/components/learn/learning-page/question-page/Header";
 import historyData from "@/data/user_question_history.json";
+import { useApi } from "@/service/useApi";
 
 export default function QuestionPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const params = useParams();
   const subjectId = params?.subjectId as string;
+  const { updateUserProgress } = useApi();
 
   const { data, isLoading, isError } = useQuestions(subjectId);
 
@@ -73,11 +75,22 @@ export default function QuestionPage() {
             currentIndex={currentIndex}
             total={incompleteQuestions.length}
             onPrev={() => setCurrentIndex((i) => Math.max(i - 1, 0))}
-            onNext={() =>
-              setCurrentIndex((i) =>
-                Math.min(i + 1, incompleteQuestions.length - 1),
-              )
-            }
+            onNext={async () => {
+              const nextIndex = Math.min(
+                currentIndex + 1,
+                incompleteQuestions.length - 1,
+              );
+
+              // call API to update progress
+              try {
+                await updateUserProgress(Number(subjectId));
+                console.log("Progress updated for subject:", subjectId);
+              } catch (err) {
+                console.error("Failed to update progress:", err);
+              }
+
+              setCurrentIndex(nextIndex);
+            }}
           />
 
           <QuestionSections
@@ -86,7 +99,7 @@ export default function QuestionPage() {
             question={incompleteQuestions[currentIndex]}
           />
         </div>
-        <SidebarProgress questions={incompleteQuestions} />
+        {/* <SidebarProgress questions={incompleteQuestions} /> */}
       </div>
     </div>
   );

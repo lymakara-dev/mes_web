@@ -22,16 +22,19 @@ api.interceptors.request.use((config) => {
 });
 
 // Response middleware for auto-logout
-// api.interceptors.response.use(
-//   (res) => res,
-//   (err) => {
-//     if (err.response?.status === 401) {
-//       clearToken();
-//       window.location.href = "/learn/signin";
-//     }
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401) {
+      clearToken();
 
-//     return Promise.reject(err);
-//   },
-// );
+      if (window.location.pathname !== "/learn/signin") {
+        window.location.href = "/learn/signin";
+      }
+    }
+
+    return Promise.reject(err);
+  },
+);
 
 export default api;

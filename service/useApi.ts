@@ -85,6 +85,40 @@ export function useApi() {
       return res.data;
     },
 
+    getUserProgress: async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      }
+
+      const res = await api.get("/user-progress");
+      console.log("progress", res.data);
+      return res.data;
+    },
+
+    startLearning: async (subjectId: number) => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      }
+
+      const res = await api.post(`user-progress/${subjectId}/start`);
+      console.log("update progress", res.data);
+      return res.data;
+    },
+
+
+    updateUserProgress: async (subjectId: number) => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      }
+
+      const res = await api.patch(`user-progress/${subjectId}/update`);
+      console.log("update progress", res.data);
+      return res.data;
+    },
+
     getSchools: async (): Promise<School[]> => {
       const res = await api.get("/schools");
       console.log("school data", res.data);
@@ -108,6 +142,17 @@ export function useApi() {
     getSubject: async (id: string): Promise<Subject[]> => {
       const res = await api.get(`/subjects/school?schoolId=${id}`);
 
+      return res.data;
+    },
+
+    getSubjectsWithProgress: async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      }
+
+      const res = await api.get("/subjects/with-user-progress");
+      console.log("progress", res.data);
       return res.data;
     },
 
