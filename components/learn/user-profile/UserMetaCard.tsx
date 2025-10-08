@@ -11,8 +11,8 @@ import Select from "@/components/form/Select";
 
 type UserMetaCardProps = {
   avatarUrl: string;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   username: string;
   role: string;
   email: string;
@@ -20,8 +20,8 @@ type UserMetaCardProps = {
   gender?: string;
   genderOptions?: { value: string; label: string }[];
   onSave?: (updatedUser: {
-    firstName: string;
-    lastName: string;
+    firstname: string;
+    lastname: string;
     username: string;
     email: string;
     phone: string;
@@ -31,24 +31,24 @@ type UserMetaCardProps = {
 
 export default function UserMetaCard({
   avatarUrl,
-  firstName,
-  lastName,
+  firstname,
+  lastname,
   username,
   gender,
   role,
   email,
   phone,
   genderOptions = [
-    { value: "male", label: "ប្រុស" },
-    { value: "female", label: "ស្រី" },
+    { value: "MALE", label: "ប្រុស" },
+    { value: "FEMALE", label: "ស្រី" },
   ],
   onSave,
 }: UserMetaCardProps) {
   const { isOpen, openModal, closeModal } = useModal();
 
   const [formData, setFormData] = useState({
-    firstName,
-    lastName,
+    firstname,
+    lastname,
     username,
     email,
     phone,
@@ -65,8 +65,8 @@ export default function UserMetaCard({
   };
 
   const fields = [
-    { key: "firstName", label: "First Name", type: "text" },
-    { key: "lastName", label: "Last Name", type: "text" },
+    { key: "firstname", label: "First Name", type: "text" },
+    { key: "lastname", label: "Last Name", type: "text" },
     { key: "username", label: "Username", type: "text" },
     { key: "email", label: "Email Address", type: "email" },
     { key: "phone", label: "Phone", type: "text" },
@@ -89,7 +89,7 @@ export default function UserMetaCard({
               </div>
               <div>
                 <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
-                  {lastName} {firstName}
+                  {lastname} {firstname}
                 </h4>
                 <div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
                   <p className="text-sm text-gray-500 dark:text-gray-400">

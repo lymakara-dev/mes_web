@@ -2,7 +2,6 @@
 
 import ProfileCard from "@/components/learn/user-profile/ProfileTable";
 import UserMetaCard from "@/components/learn/user-profile/UserMetaCard";
-import api from "@/service/api";
 import { useApi } from "@/service/useApi";
 import { User } from "@/types/user";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -31,8 +30,8 @@ export default function Profile() {
 
   const handleSave = (updatedUser: {
     username: string;
-    firstName: string;
-    lastName: string;
+    firstname: string;
+    lastname: string;
     email: string;
     phone: string;
     gender?: string;
@@ -45,8 +44,8 @@ export default function Profile() {
       <UserMetaCard
         avatarUrl={data?.userInfo?.imageUrl || ""}
         email={data?.userInfo?.email || ""}
-        firstName={data?.userInfo?.firstname || ""}
-        lastName={data?.userInfo?.lastname || ""}
+        firstname={data?.userInfo?.firstname || ""}
+        lastname={data?.userInfo?.lastname || ""}
         phone={data?.userInfo?.phone || ""}
         role={data?.role || ""}
         username={data?.username || ""}

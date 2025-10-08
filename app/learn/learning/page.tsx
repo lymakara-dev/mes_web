@@ -1,106 +1,69 @@
 "use client";
 
-import React, { useState } from "react";
-import Button from "@/components/ui/button/Button";
-import { useAdminApi } from "@/hooks/useAdminApi";
-import SchoolModal from "@/components/admin/learn/schoolModel";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 
-export default function AdminSchools() {
-  const { getSchools, createSchool, updateSchool, deleteSchool } =
-    useAdminApi();
-  const queryClient = useQueryClient();
+import MyCard from "@/components/common/Card";
+import { useApi } from "@/service/useApi";
+import { useQuery } from "@tanstack/react-query";
+import { School } from "@/types/school";
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [editingSchool, setEditingSchool] = useState<any>(null);
+const mockUniversities = [
+  {
+    id: 1,
+    image: "/images/uni-logo/itc-logo.png",
+    title: "វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា",
+    subjects: 12,
+  },
+  {
+    id: 2,
+    image: "/images/uni-logo/uhs-logo.png",
+    title: "សាកលវិទ្យាល័យវិទ្យាសាស្ត្រ សុខាភិបាល",
+    subjects: 8,
+  },
+  {
+    id: 3,
+    image: "/images/uni-logo/rupp-logo.png",
+    title: "សាកលវិទ្យាល័យភូមិន្ទភ្នំពេញ",
+    subjects: 15,
+  },
+  {
+    id: 4,
+    image: "/images/uni-logo/cadt-logo.png",
+    title: "សាកលវិទ្យាល័យពុទ្ធិសាស្ត្រ (UP)",
+    subjects: 6,
+  },
+  {
+    id: 5,
+    image: "/images/uni-logo/cadt-logo.png",
+    title: "សាកលវិទ្យាល័យពុទ្ធិសាស្ត្រ (UP)",
+    subjects: 6,
+  },
+  {
+    id: 6,
+    image: "/images/uni-logo/cadt-logo.png",
+    title: "សាកលវិទ្យាល័យពុទ្ធិសាស្ត្រ (UP)",
+    subjects: 6,
+  },
+];
 
-  // ✅ Fetch schools
-  const {
-    data: schools,
-    isLoading,
-    isError,
-  } = useQuery({
+export default function LearningPage() {
+  const { getSchools } = useApi();
+
+  const { data, isLoading, isError } = useQuery<School[]>({
     queryKey: ["schools"],
     queryFn: getSchools,
   });
 
-  // ✅ Create school mutation
-  const createMutation = useMutation({
-    mutationFn: (name: string) => createSchool(name),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["schools"] }),
-  });
-
-  // ✅ Update school mutation
-  const updateMutation = useMutation({
-    mutationFn: (payload: { id: number; name: string }) =>
-      updateSchool(payload.id, payload.name),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["schools"] }),
-  });
-
-  // ✅ Delete school mutation
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteSchool(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["schools"] }),
-  });
-
-  const handleSave = (name: string) => {
-    if (editingSchool) updateMutation.mutate({ id: editingSchool.id, name });
-    else createMutation.mutate(name);
-
-    setIsOpen(false);
-  };
-
-  if (isLoading) return <p>Loading schools...</p>;
+  if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Failed to load schools</p>;
 
   return (
-    <div className="p-5">
-      <h1 className="text-2xl font-bold mb-4">Schools</h1>
-
-      <Button
-        onClick={() => {
-          setEditingSchool(null);
-          setIsOpen(true);
-        }}
-      >
-        Add School
-      </Button>
-
-      <ul className="mt-4">
-        {schools?.map((school: any) => (
-          <li
-            key={school.id}
-            className="flex justify-between items-center p-2 border-b"
-          >
-            <span>{school.name}</span>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => {
-                  setEditingSchool(school);
-                  setIsOpen(true);
-                }}
-                size="sm"
-              >
-                Edit
-              </Button>
-              <Button
-                onClick={() => deleteMutation.mutate(school.id)}
-                size="sm"
-              >
-                Delete
-              </Button>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      {isOpen && (
-        <SchoolModal
-          school={editingSchool}
-          onClose={() => setIsOpen(false)}
-          onSave={handleSave}
-        />
-      )}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4 bg-white dark:bg-gray-900 transition-colors">
+      {data?.map((s) => (
+        <Link key={s.id} href={`/learn/learning/${s.id}`}>
+          <MyCard image={s.logoUrl} subjects={s.subjectCount} title={s.name} />
+        </Link>
+      ))}
     </div>
   );
 }

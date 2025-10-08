@@ -27,7 +27,7 @@ api.interceptors.request.use((config) => {
 //   (err) => {
 //     if (err.response?.status === 401) {
 //       clearToken();
-//       window.location.href = "/login";
+//       window.location.href = "/learn/signin";
 //     }
 
 //     return Promise.reject(err);

@@ -87,7 +87,7 @@ export function useApi() {
 
     getSchools: async (): Promise<School[]> => {
       const res = await api.get("/schools");
-
+      console.log("school data", res.data);
       return res.data;
     },
 
