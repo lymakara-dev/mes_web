@@ -103,10 +103,9 @@ export function useApi() {
       }
 
       const res = await api.post(`user-progress/${subjectId}/start`);
-      console.log("update progress", res.data);
+      // console.log("update progress", res.data);
       return res.data;
     },
-
 
     updateUserProgress: async (subjectId: number) => {
       const token = localStorage.getItem("token");
