@@ -12,6 +12,7 @@ type SidebarProgressProps = {
 export default function SidebarProgress({ questions }: SidebarProgressProps) {
   const [history] = useState(user_quesiton_history);
 
+  console.log("incomplete question", history);
   // merge progress
   const questionsWithProgress = useMemo(() => {
     return questions.map((q) => {
@@ -66,7 +67,7 @@ export default function SidebarProgress({ questions }: SidebarProgressProps) {
                 }`}
               >
                 {q.learned ? "✓" : ""}
-              </div> 
+              </div>
             </div>
             <span>
               Q{q.id}: {q.content}

@@ -8,6 +8,7 @@ import {
   AcademicCapIcon,
   BeakerIcon,
   EllipsisHorizontalIcon,
+  FolderIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/solid";
 
@@ -29,6 +30,11 @@ const navItems: NavItem[] = [
     icon: <AcademicCapIcon className="w-6 h-6" />,
     name: "ការសិក្សា",
     path: "/learn/learning",
+  },
+  {
+    icon: <FolderIcon className="w-6 h-6" />,
+    name: "ឯកសា",
+    path: "/learn/resource",
   },
   {
     icon: <UserCircleIcon className="w-6 h-6" />,

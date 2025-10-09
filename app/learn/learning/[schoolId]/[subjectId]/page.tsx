@@ -37,8 +37,12 @@ export default function QuestionPage() {
     const answeredIds = historyData
       .filter((h) => h.id == "0")
       .map((h) => Number(h.question_id));
+
+    console.log("answered question", answeredIds);
     return data.filter((q) => !answeredIds.includes(q.id));
   }, [data]);
+
+  console.log("incomplete question", incompleteQuestions);
 
   const currentQuestion = incompleteQuestions[currentIndex];
 
@@ -99,7 +103,7 @@ export default function QuestionPage() {
             question={incompleteQuestions[currentIndex]}
           />
         </div>
-        {/* <SidebarProgress questions={incompleteQuestions} /> */}
+        <SidebarProgress questions={incompleteQuestions} />
       </div>
     </div>
   );
