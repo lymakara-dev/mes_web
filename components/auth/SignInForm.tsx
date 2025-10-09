@@ -8,9 +8,10 @@ import React, { useState } from "react";
 import Checkbox from "../form/input/Checkbox";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/service/useApi";
+import { AuthApi } from "@/hooks/learn/user/auth-api";
 
 export default function SignInForm() {
-  const api = useApi();
+  const api = AuthApi();
   const router = useRouter();
 
   const [username, setUsername] = useState(""); // backend uses username

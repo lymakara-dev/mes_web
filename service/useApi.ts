@@ -8,65 +8,6 @@ import { User } from "@/types/user";
 
 export function useApi() {
   return {
-    // --- Auth ---
-    login: async (username: string, password: string) => {
-      const res = await api.post("/auth/sign-in", {
-        username,
-        password,
-      });
-
-      console.log("user res", res);
-      const { accessToken, user } = res.data;
-
-      // Save token to localStorage for persistence
-      localStorage.setItem("token", accessToken);
-
-      // Set token in axios headers
-      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-
-      return user;
-    },
-
-    register: async (name: string, email: string, password: string) => {
-      const res = await api.post("/auth/register", { name, email, password });
-      return res.data;
-    },
-
-    getProfile: async (): Promise<User> => {
-      // Ensure the token is set (in case of page reload)
-      const token = localStorage.getItem("token");
-      if (token) {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      }
-
-      // Call the protected endpoint
-      const res = await api.get("/auth/profile");
-      console.log("profile", res.data);
-      return res.data;
-    },
-
-    updateProfile: async (payload: {
-      username?: string;
-      firstName?: string;
-      lastName?: string;
-      email?: string;
-      phone?: string;
-      gender?: string;
-    }): Promise<User> => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      }
-
-      const res = await api.patch("auth/profile", payload);
-      return res.data;
-    },
-
-    logout: () => {
-      localStorage.removeItem("token");
-      delete api.defaults.headers.common["Authorization"];
-    },
-
     getUser: async (id: number): Promise<User> => {
       const res = await api.get(`/users/${id}`);
 
@@ -96,17 +37,6 @@ export function useApi() {
       return res.data;
     },
 
-    startLearning: async (subjectId: number) => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      }
-
-      const res = await api.post(`user-progress/${subjectId}/start`);
-      // console.log("update progress", res.data);
-      return res.data;
-    },
-
     updateUserProgress: async (subjectId: number) => {
       const token = localStorage.getItem("token");
       if (token) {
@@ -114,7 +44,6 @@ export function useApi() {
       }
 
       const res = await api.patch(`user-progress/${subjectId}/update`);
-      console.log("update progress", res.data);
       return res.data;
     },
 
@@ -151,7 +80,6 @@ export function useApi() {
       }
 
       const res = await api.get("/subjects/with-user-progress");
-      console.log("progress", res.data);
       return res.data;
     },
 
@@ -161,5 +89,12 @@ export function useApi() {
       return res.data;
     },
     // Add more as needed
+
+    // Documents
+    getDocuments: async () => {
+      const res = await api.get("/documents");
+      console.log("doc data", res.data);
+      return res.data;
+    },
   };
 }

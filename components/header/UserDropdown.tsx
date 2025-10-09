@@ -4,14 +4,14 @@ import Image from "next/image";
 
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { useApi } from "@/service/useApi";
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@/types/user";
 import { Button } from "@heroui/button";
 import { useRouter } from "next/navigation";
+import { AuthApi } from "@/hooks/learn/user/auth-api";
 
 export default function UserDropdown() {
-  const { getProfile, logout } = useApi();
+  const { getProfile, logout } = AuthApi();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 

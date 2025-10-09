@@ -1,6 +1,8 @@
 "use client";
 
 import SubjectCard from "@/components/learn/learning-page/SubjectCard";
+import { SubjectApi } from "@/hooks/learn/user/subject-api";
+import { UserProgressApi } from "@/hooks/learn/user/user-progress-api";
 import { useApi } from "@/service/useApi";
 import { Subject } from "@/types/subject";
 import { useQuery } from "@tanstack/react-query";
@@ -46,27 +48,26 @@ export default function SubjectPage() {
   const schoolId = params?.schoolId;
   const router = useRouter();
 
-  const { getSubjectsWithProgress, startLearning } = useApi();
+  const { getSubjectBySchool } = SubjectApi();
+  const { startLearning, resetProgress } = UserProgressApi();
 
-  // const { data, isLoading, isError } = useQuery<Subject[]>({
-  //   queryKey: ["subjects", schoolId],
-  //   queryFn: () => getSubject(schoolId as string),
-  // });
-  const { data, isLoading, isError } = useQuery<Subject[]>({
-    queryKey: ["progress"],
-    queryFn: getSubjectsWithProgress,
+  const { data, isLoading, isError, refetch } = useQuery<Subject[]>({
+    queryKey: ["subject"],
+    queryFn: () => getSubjectBySchool(Number(schoolId)),
   });
-
-  console.log("subject user progress", data);
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Fail to load subjects</p>;
 
-  const handleStartLearning = async (subjectId: number) => {
+  const handleStartLearning = async (subjectId: number, progress: number) => {
     try {
-      await startLearning(subjectId); // call backend to initialize progress
-      console.log("start", await startLearning(subjectId));
-      router.push(`/learn/learning/${schoolId}/${subjectId}`); // navigate to question page
+      if (progress === 100) {
+        await resetProgress(subjectId);
+        await refetch();
+      }
+
+      await startLearning(subjectId);
+      router.push(`/learn/learning/${schoolId}/${subjectId}`);
     } catch (err) {
       console.error("Failed to start learning:", err);
     }
@@ -74,18 +75,25 @@ export default function SubjectPage() {
 
   return (
     <div>
-      {data?.map((subject) => (
-        <div key={subject.id}>
-          <SubjectCard
-            buttonLabel={"ចាប់ផ្ដើម"}
-            image={subject.logoUrl}
-            progress={subject.userProgress}
-            questions={subject.questionCount}
-            title={subject.name}
-            onClickButton={() => handleStartLearning(subject.id)}
-          />
-        </div>
-      ))}
+      {data?.map((subject) => {
+        const isCompleted = subject.userProgress === 100;
+        const buttonLabel = isCompleted ? "ម្ដងទៀត" : "ចាប់ផ្ដើម";
+
+        return (
+          <div key={subject.id}>
+            <SubjectCard
+              buttonLabel={buttonLabel}
+              image={subject.logoUrl}
+              progress={subject.userProgress}
+              questions={subject.questionCount}
+              title={subject.name}
+              onClickButton={() =>
+                handleStartLearning(subject.id, subject.userProgress)
+              }
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
