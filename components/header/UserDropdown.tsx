@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { User } from "@/types/user";
 import { Button } from "@heroui/button";
 import { useRouter } from "next/navigation";
-import { AuthApi } from "@/hooks/learn/user/auth-api";
+import { AuthApi } from "@/hooks/learn/auth-api";
 
 export default function UserDropdown() {
   const { getProfile, logout } = AuthApi();

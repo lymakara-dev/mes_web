@@ -1,6 +1,6 @@
 "use client";
 
-import { useApi } from "@/service/useApi";
+import { DocumentApi } from "@/hooks/learn/document-api";
 import { useQuery } from "@tanstack/react-query";
 import {
   FileText,
@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 export default function ResourcePage() {
-  const { getDocuments } = useApi();
+  const { getDocuments } = DocumentApi();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["Documents"],

@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import Checkbox from "../form/input/Checkbox";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/service/useApi";
-import { AuthApi } from "@/hooks/learn/user/auth-api";
+import { AuthApi } from "@/hooks/learn/auth-api";
 
 export default function SignInForm() {
   const api = AuthApi();

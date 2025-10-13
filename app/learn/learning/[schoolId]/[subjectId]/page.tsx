@@ -8,14 +8,14 @@ import QuestionSections from "@/components/learn/learning-page/question-page/Que
 import SidebarProgress from "@/components/learn/learning-page/question-page/SidebarProgress";
 import Header from "@/components/learn/learning-page/question-page/Header";
 import historyData from "@/data/user_question_history.json";
-import { useApi } from "@/service/useApi";
+import { UserProgressApi } from "@/hooks/learn/user-progress-api";
 
 export default function QuestionPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const params = useParams();
   const subjectId = params?.subjectId as string;
-  const { updateUserProgress } = useApi();
+  const { updateUserProgress } = UserProgressApi();
 
   const { data, isLoading, isError } = useQuestions(subjectId);
 
@@ -74,7 +74,6 @@ export default function QuestionPage() {
       <div className="w-full h-full flex flex-col gap-5 md:flex-row">
         <div className="flex flex-col flex-1 gap-5 ">
           <QuestionCard question={currentQuestion} />
-
           <QuestionNavigation
             currentIndex={currentIndex}
             total={incompleteQuestions.length}
@@ -96,7 +95,6 @@ export default function QuestionPage() {
               setCurrentIndex(nextIndex);
             }}
           />
-
           <QuestionSections
             activeSection={activeSection}
             setActiveSection={setActiveSection}

@@ -1,9 +1,8 @@
 "use client";
 
 import SubjectCard from "@/components/learn/learning-page/SubjectCard";
-import { SubjectApi } from "@/hooks/learn/user/subject-api";
-import { UserProgressApi } from "@/hooks/learn/user/user-progress-api";
-import { useApi } from "@/service/useApi";
+import { SubjectApi } from "@/hooks/learn/subject-api";
+import { UserProgressApi } from "@/hooks/learn/user-progress-api";
 import { Subject } from "@/types/subject";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
