@@ -13,18 +13,21 @@ export default function QuestionCard({ question }: QuestionCardProps) {
 
   if (!question) return <p>Loading...</p>;
 
+  console.log("question type", question);
+
   // Render question
   const renderQuestion = () => {
     switch (question.contentType) {
       case "LATEX":
-        return <Latex>{`$$${question.content}$$`}</Latex>;
+        return <Latex>{question.content}</Latex>;
       case "IMAGE":
         return (
           <Image
             alt="Question"
-            height={300}
+            height={500}
             src={question.content!}
-            width={300}
+            width={500}
+            className="w-full h-auto"
           />
         );
       case "VIDEO":
@@ -40,10 +43,19 @@ export default function QuestionCard({ question }: QuestionCardProps) {
   };
 
   // Render answer option
-  const renderAnswer = (ans: Answer) => {
-    if (ans.contentType === "LATEX") return <Latex>{ans.content}</Latex>;
+  const renderAnswer = (ans: Answer, index: number) => {
+    if (ans.contentType === "LATEX") return <Latex>{`${ans.content}`}</Latex>;
     if (ans.contentType === "IMAGE")
-      return <Image alt="answer" height={100} src={ans.content} width={100} />;
+      return (
+        <Image
+          alt="answer"
+          src={`${ans.content!}`}
+          width={0}
+          height={0}
+          className="w-full max-w-[150px] h-auto object-contain"
+          unoptimized
+        />
+      );
 
     return ans.content;
   };
@@ -59,18 +71,19 @@ export default function QuestionCard({ question }: QuestionCardProps) {
     <div className="bg-white dark:bg-gray-900 border border-gray-200 rounded-2xl p-4">
       <div>
         <div>{renderQuestion()}</div>
-        {isCorect}
         <div className="answers mt-4 flex flex-col gap-3">
           {question.answers.map((ans: any, index) => (
             <button
               key={ans.id}
-              className={`p-2 border rounded flex justify-start items-center ${
-                selected === ans.id ? "bg-blue-100 border-blue-500" : ""
+              className={`p-4 border h-24 rounded-xl text-lg flex justify-start items-center transition-all duration-200 ${
+                selected === ans.id
+                  ? "bg-blue-100 border-blue-500"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
               onClick={() => handleSelect(ans)}
             >
-              <span className="w-6">{toKhmerLetter(index)}. </span>
-              {renderAnswer(ans)}
+              <span className="w-6">{toKhmerLetter(index)}.</span>
+              <span className="ml-2">{renderAnswer(ans, index)} </span>
             </button>
           ))}
         </div>

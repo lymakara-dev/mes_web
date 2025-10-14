@@ -72,7 +72,7 @@ export default function QuestionPage() {
       />
 
       <div className="w-full h-full flex flex-col gap-5 md:flex-row">
-        <div className="flex flex-col flex-1 gap-5 ">
+        <div className="flex flex-col flex-1 gap-5">
           <QuestionCard question={currentQuestion} />
           <QuestionNavigation
             currentIndex={currentIndex}
