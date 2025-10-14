@@ -7,8 +7,8 @@ import Link from "next/link";
 import React, { useState } from "react";
 import Checkbox from "../form/input/Checkbox";
 import { useRouter } from "next/navigation";
-import { useApi } from "@/service/useApi";
 import { AuthApi } from "@/hooks/learn/auth-api";
+import { addToast } from "@heroui/react";
 
 export default function SignInForm() {
   const api = AuthApi();
@@ -25,19 +25,74 @@ export default function SignInForm() {
     setLoading(true);
 
     try {
-      const user = await api.login(username, password);
-      console.log("user sign in ", user);
+      setLoading(true); // optional, show a loading spinner
 
-      // Save user object locally for temporary use
+      // Call your API login
+      const user = await api.login(username, password);
+      console.log("user sign in", user);
+
+      // Save user locally
       localStorage.setItem("user", JSON.stringify(user));
 
-      alert(`Welcome, ${user.username}!`);
+      addToast({
+        title: "Login Successful",
+        description: `Welcome, ${user.username || "user"}!`,
+        color: "success",
+      });
+
+      // Redirect after successful login
       router.push("/learn/dashboard");
     } catch (error: any) {
+      // Axios error handling
+      if (error.response) {
+        // Backend responded with a status code outside 2xx
+        const status = error.response.status;
+
+        if (status === 401) {
+          // alert("Invalid username or password"); // wrong credentials
+          addToast({
+            title: "Invalid Credentials",
+            description: "Invalid username or password. Please try again.",
+            color: "danger",
+          });
+        } else if (status === 500) {
+          // alert("Server error. Please try again later.");
+          addToast({
+            title: "Server Error",
+            description:
+              "Something went wrong on our side. Please try again later.",
+            color: "warning",
+          });
+        } else {
+          // alert(error.response.data?.message || "Login failed");
+          addToast({
+            title: "Login Failed",
+            description: error.response.data?.message || "Unable to sign in.",
+            color: "danger",
+          });
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        // alert("No response from server. Check your network.");
+        addToast({
+          title: "Network Error",
+          description:
+            "No response from the server. Please check your connection.",
+          color: "warning",
+        });
+      } else {
+        // Something else happened
+        // alert("Login error: " + error.message);
+        addToast({
+          title: "Unexpected Error",
+          description: error.message,
+          color: "danger",
+        });
+      }
+
       console.error("Login failed", error);
-      alert("Invalid username or password");
     } finally {
-      setLoading(false);
+      setLoading(false); // stop loading spinner
     }
   };
 
