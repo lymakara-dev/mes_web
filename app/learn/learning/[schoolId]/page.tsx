@@ -62,6 +62,8 @@ export default function SubjectPage() {
     try {
       if (progress === 100) {
         await resetProgress(subjectId);
+        // Clear saved local current question for this subject
+        localStorage.removeItem(`currentIndex_${subjectId}`);
         await refetch();
       }
 

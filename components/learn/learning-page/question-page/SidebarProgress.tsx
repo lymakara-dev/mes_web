@@ -1,38 +1,36 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-import user_quesiton_history from "@/data/user_question_history.json";
-import { QuestionAnswer } from "@/types/question-answer";
+import { useMemo } from "react";
 
 type SidebarProgressProps = {
-  questions: QuestionAnswer[];
+  questions: any;
+  onSelectQuestion: (index: number) => void;
+  currentIndex: number;
 };
 
-export default function SidebarProgress({ questions }: SidebarProgressProps) {
-  const [history] = useState(user_quesiton_history);
-
-  console.log("incomplete question", history);
-  // merge progress
+export default function SidebarProgress({
+  questions,
+  onSelectQuestion,
+  currentIndex,
+}: SidebarProgressProps) {
+  // Merge progress from the question objects themselves
   const questionsWithProgress = useMemo(() => {
-    return questions.map((q) => {
-      const attempt = history.find((h) => h.question_id === String(q.id));
+    return questions.map((q: any) => ({
+      ...q,
+      learned: q.status === "completed",
+      isCorrect: q.isCorrect ?? null,
+    }));
+  }, [questions]);
 
-      return {
-        ...q,
-        learned: !!attempt,
-        isCorrect: attempt?.is_correct ?? null,
-      };
-    });
-  }, [questions, history]);
-
-  // calculate progress
+  // Calculate progress
   const total = questions.length;
-  const completed = questionsWithProgress.filter((q) => q.learned).length;
-  const progressPercentage = Math.round((completed / total) * 100);
+  const completed = questionsWithProgress.filter((q: any) => q.learned).length;
+  const progressPercentage =
+    total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
     <aside className="w-full h-full md:w-80 bg-white rounded-2xl shadow-sm p-6 dark:bg-gray-800">
+      {/* Title */}
       <h3 className="font-semibold text-2xl text-[#06598F] mb-4">លំហាត់សរុប</h3>
 
       {/* Progress bar */}
@@ -48,31 +46,34 @@ export default function SidebarProgress({ questions }: SidebarProgressProps) {
 
       {/* Question list */}
       <div className="space-y-2 max-h-[70vh] overflow-y-auto">
-        {questionsWithProgress.map((q) => (
-          <div
+        {questionsWithProgress.map((q: any, index: any) => (
+          <button
             key={q.id}
-            className={`p-2 rounded-lg text-sm flex flex-row justify-start items-center gap-2 ${
-              q.learned
-                ? "bg-blue-50 text-blue-700"
-                : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+            onClick={() => onSelectQuestion(index)}
+            className={`w-full text-left p-2 rounded-lg text-sm flex items-center gap-2 transition-colors ${
+              index === currentIndex
+                ? "bg-blue-100 text-blue-900"
+                : q.learned
+                  ? "bg-blue-50 text-blue-700"
+                  : "bg-gray-50 text-gray-600 hover:bg-gray-100"
             }`}
           >
-            {/* Status */}
-            <div>
-              <div
-                className={`ml-2 w-6 h-6 flex items-center justify-center rounded-full border ${
-                  q.learned
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-500 border-gray-300"
-                }`}
-              >
-                {q.learned ? "✓" : ""}
-              </div>
+            {/* Status circle */}
+            <div
+              className={`ml-2 w-6 h-6 flex items-center justify-center rounded-full border ${
+                q.learned
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-500 border-gray-300"
+              }`}
+            >
+              {q.learned ? "✓" : ""}
             </div>
+
+            {/* Question content */}
             <span>
-              Q{q.id}: {q.content}
+              Lesson{index + 1}: {q.contentType}
             </span>
-          </div>
+          </button>
         ))}
       </div>
     </aside>

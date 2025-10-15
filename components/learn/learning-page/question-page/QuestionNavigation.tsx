@@ -1,3 +1,4 @@
+import { Button, ButtonGroup } from "@heroui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 type QuestionNavigationProps = {
@@ -5,6 +6,7 @@ type QuestionNavigationProps = {
   total: number;
   onPrev: () => void;
   onNext: () => void;
+  onFinish: () => void;
 };
 
 export default function QuestionNavigation({
@@ -12,23 +14,34 @@ export default function QuestionNavigation({
   total,
   onPrev,
   onNext,
+  onFinish,
 }: QuestionNavigationProps) {
   return (
     <div className="flex justify-between mt-6">
-      <button
-        className="px-4 py-2 flex items-center gap-2 rounded-lg border text-gray-600 hover:bg-gray-50"
-        disabled={currentIndex === 0}
-        onClick={onPrev}
+      {/* Hide Prev button on the first question */}
+      {currentIndex > 0 ? (
+        <Button
+          className="px-4 py-2 flex items-center gap-2 rounded-lg border text-gray-600 hover:bg-gray-50"
+          onClick={onPrev}
+        >
+          <ArrowLeft /> Prev
+        </Button>
+      ) : (
+        <div /> // Empty div to keep spacing consistent
+      )}
+
+      {/* Change Next button to Finish on the last question */}
+      <Button
+        className={`px-4 py-2 flex items-center gap-2 rounded-lg text-white ${
+          currentIndex === total - 1
+            ? "bg-green-600 hover:bg-green-700"
+            : "bg-blue-600 hover:bg-blue-800"
+        }`}
+        onClick={currentIndex === total - 1 ? onFinish : onNext}
       >
-        <ArrowLeft /> Prev
-      </button>
-      <button
-        className="px-4 py-2 flex items-center gap-2 rounded-lg bg-blue-600 text-white hover:bg-blue-800"
-        disabled={currentIndex === total - 1}
-        onClick={onNext}
-      >
-        Next <ArrowRight />
-      </button>
+        {currentIndex === total - 1 ? "Finish" : "Next"}{" "}
+        {currentIndex === total - 1 ? null : <ArrowRight />}
+      </Button>
     </div>
   );
 }
