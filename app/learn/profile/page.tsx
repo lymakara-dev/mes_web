@@ -2,12 +2,12 @@
 
 import ProfileCard from "@/components/learn/user-profile/ProfileTable";
 import UserMetaCard from "@/components/learn/user-profile/UserMetaCard";
-import { useApi } from "@/service/useApi";
+import { AuthApi } from "@/hooks/learn/auth-api";
 import { User } from "@/types/user";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function Profile() {
-  const { getProfile, updateProfile } = useApi();
+  const { getProfile, updateProfile } = AuthApi();
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useQuery<User>({

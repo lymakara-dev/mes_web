@@ -1,11 +1,11 @@
 "use client";
 
 import ActionButtons from "./ActionButtons";
-import CommentSection from "./NoteSection";
 import ChatBotSection from "./ChatBotSection";
 import HintSection from "./HintSection";
 import ReportSection from "./ReportSection";
 import { QuestionAnswer } from "@/types/question-answer";
+import NoteSection from "./NoteSection";
 
 interface QuestionSectionsProps {
   activeSection: "note" | "chatbot" | "hint" | "report";
@@ -27,10 +27,10 @@ export default function QuestionSections({
       />
 
       {/* Conditional Sections */}
-      {activeSection === "note" && <CommentSection />}
+      {activeSection === "note" && <NoteSection questionId={question.id} />}
       {activeSection === "chatbot" && <ChatBotSection />}
       {activeSection === "hint" && <HintSection hint={question?.hint || ""} />}
-      {activeSection === "report" && <ReportSection />}
+      {activeSection === "report" && <ReportSection questionId={question.id} />}
     </div>
   );
 }

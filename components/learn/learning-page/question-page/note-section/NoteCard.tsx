@@ -1,9 +1,10 @@
 "use client";
 
+import { Note } from "@/types/note";
 import { Edit, Trash } from "lucide-react";
 
 interface NoteCardProps {
-  note: { id: number; title: string; content: string };
+  note: Note;
   onDelete: (id: number) => void;
   onEdit: (id: number) => void;
 }
@@ -13,7 +14,7 @@ export default function NoteCard({ note, onDelete, onEdit }: NoteCardProps) {
     <div className="p-4 bg-white rounded-2xl shadow-md flex flex-col justify-between hover:shadow-lg transition">
       <div>
         <h3 className="text-lg font-semibold">{note.title}</h3>
-        <p className="text-gray-600 mt-2">{note.content}</p>
+        <p className="text-gray-600 mt-2">{note.note}</p>
       </div>
       <div className="flex justify-end gap-3 mt-4">
         <button
