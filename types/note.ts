@@ -2,7 +2,9 @@
 export interface Note {
   id: number;
   title: string;
-  content: string;
+  note: string;
+  questionId?: number;
+  userId?: number;
 }
 
 // For creating/editing (id optional)

@@ -18,22 +18,22 @@ export default function NoteModal({
   initialNote,
 }: NoteModalProps) {
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [note, setNote] = useState("");
 
   // Populate when editing
   useEffect(() => {
     if (initialNote) {
       setTitle(initialNote.title);
-      setContent(initialNote.content);
+      setNote(initialNote.note);
     } else {
       setTitle("");
-      setContent("");
+      setNote("");
     }
   }, [initialNote]);
 
   const handleSubmit = () => {
-    if (!title.trim() || !content.trim()) return;
-    onSave({ id: initialNote?.id, title, content });
+    if (!title.trim() || !note.trim()) return;
+    onSave({ id: initialNote?.id, title, note });
     onClose();
   };
 
@@ -56,8 +56,8 @@ export default function NoteModal({
         <textarea
           className="w-full border p-2 rounded mb-3 h-28 resize-none dark:bg-gray-700 dark:text-white"
           placeholder="Note Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
         />
 
         <div className="flex justify-end gap-2">

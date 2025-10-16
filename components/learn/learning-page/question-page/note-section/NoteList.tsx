@@ -1,12 +1,7 @@
 "use client";
 
+import { Note } from "@/types/note";
 import NoteCard from "./NoteCard";
-
-interface Note {
-  id: number;
-  title: string;
-  content: string;
-}
 
 interface NoteListProps {
   notes: Note[];
