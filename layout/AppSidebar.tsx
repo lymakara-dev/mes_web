@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,7 +20,7 @@ type NavItem = {
   path: string;
 };
 
-const navItems: NavItem[] = [
+const learnNavItems: NavItem[] = [
   {
     icon: <BeakerIcon className="w-6 h-6" />,
     name: "ផ្ទាំងព័ត៌មាន",
@@ -43,9 +43,54 @@ const navItems: NavItem[] = [
   },
 ];
 
+const adminNavItems: NavItem[] = [
+  {
+    icon: <BeakerIcon className="w-6 h-6" />,
+    name: "Dashboard",
+    path: "/learn/admin/dashboard",
+  },
+  {
+    icon: <FolderIcon className="w-6 h-6" />,
+    name: "Manage Users",
+    path: "/learn/admin/users",
+  },
+  {
+    icon: <AcademicCapIcon className="w-6 h-6" />,
+    name: "Manage School",
+    path: "/learn/admin/schools",
+  },
+  {
+    icon: <AcademicCapIcon className="w-6 h-6" />,
+    name: "Manage Subjects",
+    path: "/learn/admin/subjects",
+  },
+  {
+    icon: <AcademicCapIcon className="w-6 h-6" />,
+    name: "Manage Questions",
+    path: "/learn/admin/questions",
+  },
+  {
+    icon: <AcademicCapIcon className="w-6 h-6" />,
+    name: "Manage Documents",
+    path: "/learn/admin/documents",
+  },
+];
+
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+
+  const [clientNavItems, setClientNavItems] =
+    useState<NavItem[]>(learnNavItems);
+
+  useEffect(() => {
+    if (!pathname) return;
+    if (pathname.startsWith("/learn/admin")) {
+      setClientNavItems(adminNavItems);
+    } else {
+      setClientNavItems(learnNavItems);
+    }
+  }, [pathname]);
 
   const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
@@ -141,7 +186,7 @@ const AppSidebar: React.FC = () => {
                 <EllipsisHorizontalIcon className="w-5 h-5" />
               )}
             </h2>
-            {renderMenuItems(navItems)}
+            {renderMenuItems(clientNavItems)}
           </div>
         </nav>
       </div>

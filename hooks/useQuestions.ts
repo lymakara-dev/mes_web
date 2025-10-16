@@ -5,7 +5,7 @@ export function useQuestions(subjectId: string) {
   const { getQuestionBySubjectId } = QuestionApi();
 
   return useQuery({
-    queryKey: ["question", subjectId],
+    queryKey: ["questions", subjectId],
     queryFn: () => getQuestionBySubjectId(subjectId),
   });
 }
