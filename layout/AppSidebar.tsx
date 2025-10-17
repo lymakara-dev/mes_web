@@ -44,16 +44,16 @@ const learnNavItems: NavItem[] = [
 ];
 
 const adminNavItems: NavItem[] = [
-  {
-    icon: <BeakerIcon className="w-6 h-6" />,
-    name: "Dashboard",
-    path: "/learn/admin/dashboard",
-  },
-  {
-    icon: <FolderIcon className="w-6 h-6" />,
-    name: "Manage Users",
-    path: "/learn/admin/users",
-  },
+  // {
+  //   icon: <BeakerIcon className="w-6 h-6" />,
+  //   name: "Dashboard",
+  //   path: "/learn/admin/dashboard",
+  // },
+  // {
+  //   icon: <FolderIcon className="w-6 h-6" />,
+  //   name: "Manage Users",
+  //   path: "/learn/admin/users",
+  // },
   {
     icon: <AcademicCapIcon className="w-6 h-6" />,
     name: "Manage School",
