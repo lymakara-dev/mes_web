@@ -14,40 +14,53 @@ import {
   Dropdown,
   DropdownMenu,
   DropdownItem,
-  User,
   Pagination,
   useDisclosure,
   addToast,
   Chip,
+  Tooltip, // Added Tooltip for long reasons
 } from "@heroui/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, MoreVertical, Search, ChevronDown, Upload } from "lucide-react";
+import { MoreVertical, Search, ChevronDown, Check, X } from "lucide-react"; // Updated icons
 import apiService from "@/service/api";
-import { StudentModal } from "@/components/student/student-modal";
-import { StudentBulkUploadModal } from "@/components/student/student-bulk-upload-modal";
 import { useDebounce } from "@/hooks/useDebounce";
-import {
-  ICreateStudentPayload,
-  // Note: Assuming IPaginatedStudents is now defined as:
-  // export interface IPaginatedStudents { count: number; rows: IStudent[]; }
-  IPaginatedStudents,
-  IStudent,
-  IUpdateStudentPayload,
-} from "@/types/type";
 import { ConfirmationModal } from "@/components/common/confirmation-modal";
 import { format } from "date-fns";
 
+// --- New Types based on your Report API response ---
+// NOTE: You should place these in your '@/types/type.ts' file
+export interface IReport {
+  id: number;
+  userId: number;
+  questionId: number;
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface IPaginatedReports {
+  count: number;
+  rows: IReport[];
+}
+// ----------------------------------------------------
+
 const columns = [
-  { name: "NAME", uid: "name", sortable: true },
-  { name: "EMAIL", uid: "email" },
-  { name: "ROLE", uid: "role" },
-  { name: "JOINED", uid: "createdAt", sortable: true },
+  { name: "REPORT ID", uid: "id", sortable: true },
+  { name: "QUESTION ID", uid: "questionId", sortable: true },
+  { name: "USER ID", uid: "userId" },
+  { name: "REASON", uid: "reason" },
+  { name: "REPORTED AT", uid: "createdAt", sortable: true },
   { name: "ACTIONS", uid: "actions" },
 ];
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "role", "createdAt", "actions"];
+const INITIAL_VISIBLE_COLUMNS = [
+  "id",
+  "questionId",
+  "reason",
+  "createdAt",
+  "actions",
+];
 
-export default function StudentManagementPage() {
+export default function ReportManagementPage() {
   const queryClient = useQueryClient();
 
   // --- State ---
@@ -65,25 +78,18 @@ export default function StudentManagementPage() {
 
   // --- Modal State ---
   const {
-    isOpen: isFormOpen,
-    onOpen: onFormOpen,
-    onOpenChange: onFormOpenChange,
-  } = useDisclosure();
-  const {
-    isOpen: isUploadOpen,
-    onOpen: onUploadOpen,
-    onOpenChange: onUploadOpenChange,
-  } = useDisclosure();
-  const {
     isOpen: isConfirmOpen,
     onOpen: onConfirmOpen,
     onOpenChange: onConfirmOpenChange,
   } = useDisclosure();
 
-  const [activeStudent, setActiveStudent] = useState<IStudent | null>(null);
+  const [activeReport, setActiveReport] = useState<IReport | null>(null);
+  const [actionType, setActionType] = useState<"resolve" | "dismiss" | null>(
+    null,
+  );
 
   const queryKey = [
-    "students",
+    "reports",
     page,
     rowsPerPage,
     debouncedFilterValue,
@@ -91,7 +97,7 @@ export default function StudentManagementPage() {
   ];
 
   // --- Data Fetching ---
-  const { data: studentsResponse, isLoading } = useQuery<IPaginatedStudents>({
+  const { data: reportsResponse, isLoading } = useQuery<IPaginatedReports>({
     queryKey: queryKey,
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -100,65 +106,25 @@ export default function StudentManagementPage() {
         sortBy: sortDescriptor.column,
         sortOrder: sortDescriptor.direction === "ascending" ? "asc" : "desc",
       });
+      // Assuming search filter applies to the 'reason' or other default fields
       if (debouncedFilterValue) params.set("search", debouncedFilterValue);
-      const res = await apiService.get(`/users?${params.toString()}`);
 
-      // The API response is { count: number, rows: IStudent[] }
-      // The component expects name and email to be directly on IStudent,
-      // but they are nested under userInfo.
-      // This will be handled in renderCell
-      console.log("user data ahhaa", res.data);
-      return res.data;
+      // FIX: Updated API endpoint for reports
+      const res = await apiService.get(`/reports?${params.toString()}`);
+
+      console.log("report data", res.data);
+      return res.data; // Expecting { count: number, rows: IReport[] }
     },
   });
 
-  // --- Mutations ---
-  const { mutate: createStudent, isPending: isCreating } = useMutation({
-    mutationFn: (payload: ICreateStudentPayload) =>
-      apiService.post("/users", payload),
+  // --- Mutations: Resolve/Dismiss (assuming DELETE is used for resolution/dismissal) ---
+  const { mutate: processReport, isPending: isProcessing } = useMutation({
+    // Assuming reports are deleted/resolved via a simple DELETE endpoint
+    mutationFn: () => apiService.delete(`/reports/${activeReport?.id}`),
     onSuccess: () => {
       addToast({
         title: "Success",
-        description: "Student created.",
-        color: "success",
-      });
-      queryClient.invalidateQueries({ queryKey });
-      onFormOpenChange();
-    },
-    onError: (err: any) =>
-      addToast({
-        title: "Error",
-        description: err.response?.data?.message,
-        color: "danger",
-      }),
-  });
-
-  const { mutate: updateStudent, isPending: isUpdating } = useMutation({
-    mutationFn: (payload: IUpdateStudentPayload) =>
-      apiService.patch(`/users/${activeStudent?.id}`, payload),
-    onSuccess: () => {
-      addToast({
-        title: "Success",
-        description: "Student updated.",
-        color: "success",
-      });
-      queryClient.invalidateQueries({ queryKey });
-      onFormOpenChange();
-    },
-    onError: (err: any) =>
-      addToast({
-        title: "Error",
-        description: err.response?.data?.message,
-        color: "danger",
-      }),
-  });
-
-  const { mutate: deleteStudent, isPending: isDeleting } = useMutation({
-    mutationFn: () => apiService.delete(`/users/${activeStudent?.id}`),
-    onSuccess: () => {
-      addToast({
-        title: "Success",
-        description: "Student deleted.",
+        description: `Report ${actionType === "resolve" ? "resolved" : "dismissed"}.`,
         color: "success",
       });
       queryClient.invalidateQueries({ queryKey });
@@ -167,33 +133,20 @@ export default function StudentManagementPage() {
     onError: (err: any) =>
       addToast({
         title: "Error",
-        description: err.response?.data?.message,
+        description: err.response?.data?.message || `Failed to process report.`,
         color: "danger",
       }),
   });
 
   // --- Handlers ---
-  const handleOpenCreate = () => {
-    setActiveStudent(null);
-    onFormOpen();
-  };
-  const handleOpenEdit = (student: IStudent) => {
-    setActiveStudent(student);
-    onFormOpen();
-  };
-  const handleOpenDelete = (student: IStudent) => {
-    setActiveStudent(student);
+  const handleOpenProcess = (report: IReport, type: "resolve" | "dismiss") => {
+    setActiveReport(report);
+    setActionType(type);
     onConfirmOpen();
   };
 
-  const handleFormSubmit = (
-    payload: ICreateStudentPayload | IUpdateStudentPayload,
-  ) => {
-    if (activeStudent) {
-      updateStudent(payload);
-    } else {
-      createStudent(payload as ICreateStudentPayload);
-    }
+  const handleConfirmAction = () => {
+    processReport();
   };
 
   const headerColumns = useMemo(() => {
@@ -216,34 +169,31 @@ export default function StudentManagementPage() {
     setPage(1);
   }, []);
 
-  const renderCell = useCallback((student: IStudent, columnKey: React.Key) => {
-    // FIX: The student object has role/createdAt directly, but name/email are in userInfo
-    // The previous implementation was failing for 'name' and 'email' because it
-    // was trying to access student.name and student.email directly.
-    const cellValue = (student as any)[columnKey as any];
-
+  const renderCell = useCallback((report: IReport, columnKey: React.Key) => {
+    const cellValue = (report as any)[columnKey as any];
     switch (columnKey) {
-      case "name":
-        const fullName =
-          `${student.userInfo?.firstname || student.username} ${student.userInfo?.lastname || ""}`.trim();
+      case "reason":
+        // Show reason, use Chip and Tooltip if it's too long
+        const reasonText = String(cellValue);
+        const displayReason =
+          reasonText.length > 30
+            ? `${reasonText.substring(0, 30)}...`
+            : reasonText;
         return (
-          <User
-            name={fullName}
-            description={student.userInfo?.email || "N/A"}
-          />
+          <Tooltip content={reasonText}>
+            <Chip size="sm" variant="flat">
+              {displayReason}
+            </Chip>
+          </Tooltip>
         );
-      case "email":
-        return <span>{student.userInfo?.email || "N/A"}</span>;
-      case "role":
-        return (
-          <Chip size="sm" variant="flat">
-            {cellValue}
-          </Chip>
-        );
+      case "id":
+      case "questionId":
+      case "userId":
+        return <span className="text-sm font-medium">{cellValue}</span>;
       case "createdAt":
         return (
           <span className="text-sm text-gray-500">
-            {format(new Date(cellValue), "dd MMM yyyy")}
+            {format(new Date(cellValue), "dd MMM yyyy, HH:mm")}
           </span>
         );
       case "actions":
@@ -255,20 +205,22 @@ export default function StudentManagementPage() {
                   <MoreVertical />
                 </Button>
               </DropdownTrigger>
-              <DropdownMenu aria-label="Student Actions">
+              <DropdownMenu aria-label="Report Actions">
                 <DropdownItem
-                  key="edit"
-                  onPress={() => handleOpenEdit(student)}
+                  key="resolve"
+                  startContent={<Check size={16} />}
+                  onPress={() => handleOpenProcess(report, "resolve")}
                 >
-                  Edit
+                  Mark as Resolved
                 </DropdownItem>
                 <DropdownItem
-                  key="delete"
+                  key="dismiss"
                   className="text-danger"
                   color="danger"
-                  onPress={() => handleOpenDelete(student)}
+                  startContent={<X size={16} />}
+                  onPress={() => handleOpenProcess(report, "dismiss")}
                 >
-                  Delete
+                  Dismiss Report
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -280,8 +232,8 @@ export default function StudentManagementPage() {
   }, []);
 
   const topContent = useMemo(() => {
-    // FIX 1: Use 'count' from studentsResponse and calculate totalPages
-    const totalStudents = studentsResponse?.count || 0;
+    // FIX: Use 'count' from API response and calculate totalPages
+    const totalReports = reportsResponse?.count || 0;
 
     return (
       <div className="flex flex-col gap-4">
@@ -289,7 +241,7 @@ export default function StudentManagementPage() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
+            placeholder="Search by reason, ID..."
             startContent={<Search />}
             value={filterValue}
             onClear={() => setFilterValue("")}
@@ -315,27 +267,12 @@ export default function StudentManagementPage() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button
-              color="primary"
-              variant="ghost"
-              onPress={onUploadOpen}
-              startContent={<Upload size={16} />}
-            >
-              Bulk Upload
-            </Button>
-            <Button
-              color="primary"
-              endContent={<Plus />}
-              onPress={handleOpenCreate}
-            >
-              Add New
-            </Button>
+            {/* Removed "Add New" and "Bulk Upload" buttons */}
           </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            {/* FIX 2: Use totalStudents (studentsResponse?.count) */}
-            Total {totalStudents} students
+            Total {totalReports} reports
           </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
@@ -357,16 +294,14 @@ export default function StudentManagementPage() {
     visibleColumns,
     onRowsPerPageChange,
     onSearchChange,
-    studentsResponse?.count, // Dependency updated
+    reportsResponse?.count,
     rowsPerPage,
-    onUploadOpen,
-    handleOpenCreate,
   ]);
 
   const bottomContent = useMemo(() => {
-    // FIX 3: Calculate totalPages from count and rowsPerPage
-    const totalStudents = studentsResponse?.count || 0;
-    const totalPages = Math.ceil(totalStudents / rowsPerPage);
+    // FIX: Calculate totalPages from count and rowsPerPage
+    const totalReports = reportsResponse?.count || 0;
+    const totalPages = Math.ceil(totalReports / rowsPerPage);
 
     return (
       <div className="py-2 px-2 flex justify-center items-center">
@@ -376,42 +311,36 @@ export default function StudentManagementPage() {
           showShadow
           color="primary"
           page={page}
-          // FIX 4: Use the calculated totalPages
           total={totalPages || 1}
           onChange={setPage}
         />
       </div>
     );
-  }, [page, studentsResponse?.count, rowsPerPage]); // Dependencies updated
+  }, [page, reportsResponse?.count, rowsPerPage]);
+
+  const confirmationTitle =
+    actionType === "resolve" ? "Resolve Report" : "Dismiss Report";
+  const confirmationMessage = activeReport
+    ? `Are you sure you want to ${actionType} report #${activeReport.id} for question ID ${activeReport.questionId}? This action will remove it from the list.`
+    : "";
 
   return (
     <>
-      <StudentModal
-        isOpen={isFormOpen}
-        onOpenChange={onFormOpenChange}
-        onSubmit={handleFormSubmit}
-        isLoading={isCreating || isUpdating}
-        initialData={activeStudent}
-      />
-      <StudentBulkUploadModal
-        isOpen={isUploadOpen}
-        onOpenChange={onUploadOpenChange}
-        parentQueryKey={queryKey as any}
-      />
       <ConfirmationModal
         isOpen={isConfirmOpen}
         onOpenChange={onConfirmOpenChange}
-        onConfirm={() => deleteStudent()}
-        isLoading={isDeleting}
-        title="Delete Student"
-        message={`Are you sure you want to permanently delete ${activeStudent?.username || "this student"}? This action cannot be undone.`}
+        onConfirm={handleConfirmAction}
+        isLoading={isProcessing}
+        title={confirmationTitle}
+        message={confirmationMessage}
       />
-      <main className="min-h-screen  p-8 dark:bg-gray-900">
+
+      <main className="min-h-screen p-8 dark:bg-gray-900">
         <div className="mx-auto max-w-7xl">
-          <h1 className="text-3xl font-bold mb-6">Student Management</h1>
+          <h1 className="text-3xl font-bold mb-6">Report Management</h1>
           <Table
             isHeaderSticky
-            aria-label="Student management table"
+            aria-label="Report management table"
             bottomContent={bottomContent}
             bottomContentPlacement="outside"
             sortDescriptor={sortDescriptor as any}
@@ -431,12 +360,12 @@ export default function StudentManagementPage() {
               )}
             </TableHeader>
             <TableBody
-              emptyContent={"No students found"}
-              // FIX 5: Use 'rows' from API response, not 'data'
-              items={studentsResponse?.rows || []}
+              emptyContent={"No reports found"}
+              // FIX: Use 'rows' from API response
+              items={reportsResponse?.rows || []}
               isLoading={isLoading}
             >
-              {(item: IStudent) => (
+              {(item: IReport) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (
                     <TableCell>{renderCell(item, columnKey)}</TableCell>

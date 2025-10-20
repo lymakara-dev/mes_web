@@ -81,7 +81,7 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <pre className="text-sm text-wrap">{JSON.stringify(data, null, 2)}</pre>
+      {/* <pre className="text-sm text-wrap">{JSON.stringify(data, null, 2)}</pre> */}
       <LeaderboardCard
         data={mockData}
         loading={false}

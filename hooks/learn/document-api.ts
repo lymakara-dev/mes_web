@@ -1,3 +1,4 @@
+import { IPaginatedDocuments } from "@/app/learn/admin/documents/page";
 import api from "@/service/api";
 
 export interface Document {
@@ -24,8 +25,11 @@ export interface UpdateDocumentDto {
 
 export function DocumentApi() {
   return {
-    getDocuments: async (): Promise<Document[]> => {
-      const res = await api.get("/documents");
+    getDocuments: async (
+      queryString: string = "",
+    ): Promise<IPaginatedDocuments> => {
+      const res = await api.get(`/documents${queryString}`);
+      console.log("data doc calls", res.data);
       return res.data;
     },
 

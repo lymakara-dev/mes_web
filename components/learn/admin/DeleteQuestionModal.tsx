@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@heroui/react";
 import { addToast } from "@heroui/react";
 import { QuestionApi } from "@/hooks/learn/question-api";
@@ -11,37 +11,43 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   questionId: number | null;
-  refreshQuestions: () => void;
+  // CHANGED: Use invalidate to refetch data
+  invalidateQuestions: () => void;
 }
 
 export default function DeleteQuestionModal({
   isOpen,
   onClose,
   questionId,
-  refreshQuestions,
+  invalidateQuestions,
 }: Props) {
+  const [loading, setLoading] = useState(false);
+
   const handleDelete = async () => {
     if (!questionId) return;
 
+    setLoading(true);
     try {
       await questionApi.remove(questionId);
       addToast({ title: "Question deleted", color: "success" });
-      refreshQuestions();
+      // Trigger refetch of questions
+      invalidateQuestions();
     } catch {
       addToast({ title: "Failed to delete question", color: "danger" });
     } finally {
+      setLoading(false);
       onClose();
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onOpenChange={onClose}>
       <ModalContent>
         <ModalHeader>Delete Question</ModalHeader>
-        <ModalBody>Are you sure you want to delete this question?</ModalBody>
+        <ModalBody>Are you sure you want to permanently delete this question? This action cannot be undone.</ModalBody>
         <ModalFooter>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button color="danger" onClick={handleDelete}>
+          <Button onClick={onClose} isDisabled={loading}>Cancel</Button>
+          <Button color="danger" onClick={handleDelete} isLoading={loading}>
             Delete
           </Button>
         </ModalFooter>

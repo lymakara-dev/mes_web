@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Input, Select, SelectItem, Button } from "@heroui/react";
 import { addToast } from "@heroui/react";
 import { QuestionApi, Question } from "@/hooks/learn/question-api";
@@ -11,16 +11,19 @@ interface Props {
   subjects: Subject[];
   selectedQuestion: Question | null;
   setSelectedQuestion: (q: Question | null) => void;
-  fetchData: () => void;
+  invalidateQuestions: () => void;
   handleShowAnswers: (id: number) => void;
+  // ✨ NEW PROP: Handler to close the form from the parent
+  onCancel: () => void;
 }
 
 export default function QuestionForm({
   subjects,
   selectedQuestion,
   setSelectedQuestion,
-  fetchData,
+  invalidateQuestions,
   handleShowAnswers,
+  onCancel, // Destructure new prop
 }: Props) {
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [content, setContent] = useState("");
@@ -28,6 +31,18 @@ export default function QuestionForm({
   const [contentType, setContentType] = useState("TEXT");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (selectedQuestion) {
+      setSubjectId(selectedQuestion.subjectId);
+      setContent(selectedQuestion.content);
+      setHint(selectedQuestion.hint || "");
+      setContentType(selectedQuestion.contentType);
+      setFile(null);
+    } else {
+      resetForm();
+    }
+  }, [selectedQuestion]);
 
   const handleSubmitQuestion = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,37 +53,42 @@ export default function QuestionForm({
 
     setLoading(true);
     try {
-      let createdQuestion: Question;
+      let resultQuestion: Question;
 
       if (selectedQuestion) {
-        await questionApi.update(
+        resultQuestion = await questionApi.update(
           selectedQuestion.id,
           subjectId,
           content,
           contentType,
           hint,
-          file || undefined
+          file || undefined,
         );
         addToast({ title: "Question updated", color: "success" });
-        createdQuestion = selectedQuestion;
       } else {
-        const res = await questionApi.create(
+        resultQuestion = await questionApi.create(
           subjectId,
           content,
           contentType,
           hint,
-          file || undefined
+          file || undefined,
         );
         addToast({ title: "Question created", color: "success" });
-        createdQuestion = res;
       }
 
-      if (createdQuestion?.id) handleShowAnswers(createdQuestion.id);
-      setSelectedQuestion(null);
-      resetForm();
-      fetchData();
-    } catch {
-      addToast({ title: "Failed to save question", color: "danger" });
+      invalidateQuestions();
+
+      // Close the form after success
+      onCancel();
+
+      // Open answer modal right after successful save
+      if (resultQuestion?.id) handleShowAnswers(resultQuestion.id);
+    } catch (error: any) {
+      addToast({
+        title: "Failed to save question",
+        description: error.message || "An error occurred.",
+        color: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -83,10 +103,11 @@ export default function QuestionForm({
   };
 
   return (
-    <Card className="p-4 space-y-4">
+    <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Select
           label="Subject"
+          placeholder="Select Subject"
           selectedKeys={
             subjectId !== null ? new Set([subjectId.toString()]) : new Set()
           }
@@ -94,6 +115,7 @@ export default function QuestionForm({
             const key = Array.from(keys)[0];
             setSubjectId(key ? Number(key) : null);
           }}
+          isRequired
         >
           {subjects.map((s) => (
             <SelectItem key={s.id}>{s.name}</SelectItem>
@@ -111,14 +133,43 @@ export default function QuestionForm({
           <SelectItem key="IMAGE">IMAGE</SelectItem>
         </Select>
 
-        <Input label="Question Content" value={content} onChange={(e) => setContent(e.target.value)} />
-        <Input label="Hint (optional)" value={hint} onChange={(e) => setHint(e.target.value)} />
-        <Input type="file" onChange={(e) => e.target.files && setFile(e.target.files[0])} />
+        <Input
+          label="Question Content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Enter the question text"
+          isRequired
+        />
+        <Input
+          label="Hint (optional)"
+          value={hint}
+          onChange={(e) => setHint(e.target.value)}
+          placeholder="Optional hint for the user"
+        />
+        <Input
+          type="file"
+          label={
+            selectedQuestion
+              ? "Upload new file to replace existing"
+              : "Upload file (optional)"
+          }
+          onChange={(e) => e.target.files && setFile(e.target.files[0])}
+        />
       </div>
 
-      <Button color="primary" onClick={handleSubmitQuestion} isLoading={loading}>
-        {selectedQuestion ? "Update Question" : "Create Question"}
-      </Button>
-    </Card>
+      <div className="flex gap-2 pt-2">
+        <Button
+          color="primary"
+          onClick={handleSubmitQuestion}
+          isLoading={loading}
+        >
+          {selectedQuestion ? "Update Question" : "Create Question"}
+        </Button>
+        {/* ✨ NEW BUTTON: Calls the onCancel prop */}
+        <Button color="default" onClick={onCancel}>
+          Cancel
+        </Button>
+      </div>
+    </div>
   );
 }

@@ -7,7 +7,10 @@ import { usePathname } from "next/navigation";
 import {
   AcademicCapIcon,
   BeakerIcon,
+  DocumentChartBarIcon,
+  DocumentCheckIcon,
   EllipsisHorizontalIcon,
+  FlagIcon,
   FolderIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/solid";
@@ -45,34 +48,39 @@ const learnNavItems: NavItem[] = [
 
 const adminNavItems: NavItem[] = [
   // {
-  //   icon: <BeakerIcon className="w-6 h-6" />,
+  //   icon: <UserCircleIcon className="w-6 h-6" />,
   //   name: "Dashboard",
   //   path: "/learn/admin/dashboard",
   // },
-  // {
-  //   icon: <FolderIcon className="w-6 h-6" />,
-  //   name: "Manage Users",
-  //   path: "/learn/admin/users",
-  // },
+  {
+    icon: <UserCircleIcon className="w-6 h-6" />,
+    name: "User",
+    path: "/learn/admin/users",
+  },
   {
     icon: <AcademicCapIcon className="w-6 h-6" />,
-    name: "Manage School",
+    name: "School",
     path: "/learn/admin/schools",
   },
   {
     icon: <AcademicCapIcon className="w-6 h-6" />,
-    name: "Manage Subjects",
+    name: "Subjects",
     path: "/learn/admin/subjects",
   },
   {
     icon: <AcademicCapIcon className="w-6 h-6" />,
-    name: "Manage Questions",
+    name: "Questions",
     path: "/learn/admin/questions",
   },
   {
-    icon: <AcademicCapIcon className="w-6 h-6" />,
-    name: "Manage Documents",
+    icon: <DocumentCheckIcon className="w-6 h-6" />,
+    name: "Documents",
     path: "/learn/admin/documents",
+  },
+  {
+    icon: <FlagIcon className="w-6 h-6" />,
+    name: "Report",
+    path: "/learn/admin/reports",
   },
 ];
 
