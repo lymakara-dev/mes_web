@@ -1,20 +1,22 @@
+// src/types/question-answer.ts (or the unified file)
+
 export type Answer = {
-  id: string;
+  // ⭐️ CRITICAL FIX: Change 'string' to 'number' ⭐️
+  id: number; 
+  questionId: number; 
   content: string;
-  type: String;
+  contentType: "TEXT" | "IMAGE" | "LATEX" | "VIDEO";
   isCorrect: boolean;
 };
 
-export type Question = {
+export type QuestionAnswer = {
   id: number;
-  subject: string;
-  question: string;
-  questionType: String;
-  questionImage?: string;
+  subjectId: number;
+  content: string;
+  contentType: "TEXT" | "IMAGE" | "LATEX" | "VIDEO";
   hint: string;
   answers: Answer[];
 };
 
-export type QuestionCardProps = {
-  question: Question;
-};
+// Ensure your query type is an alias of the correct structure
+export type Question = QuestionAnswer;

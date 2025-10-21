@@ -13,7 +13,7 @@ import { LoginForm2 } from "@/components/auth/SignInForm2";
 import { FieldDescription } from "@/components/ui/field";
 
 type Inputs = {
-  email: string;
+  login: string;
   password: string;
 };
 
@@ -33,6 +33,7 @@ export default function LoginPage() {
     mutationFn: (data: Inputs) => apiService.post("/auth/login", data),
     onSuccess: (response) => {
       const authData = response.data; // The { user, accessToken } payload
+
       login(authData);
 
       addToast({
@@ -78,7 +79,7 @@ export default function LoginPage() {
           />
           <div className="bg-muted relative hidden md:block">
             <img
-              src="/placeholder.svg"
+              src="https://static.vecteezy.com/system/resources/previews/056/583/330/non_2x/illustration-of-a-woman-taking-an-online-exam-on-a-laptop-vector.jpg"
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />

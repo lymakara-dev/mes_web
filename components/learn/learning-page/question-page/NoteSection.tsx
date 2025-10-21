@@ -1,63 +1,114 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Plus } from "lucide-react";
-
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import NoteList from "./note-section/NoteList";
 import NoteModal from "./note-section/NoteModal";
-
-import { Note, NoteInput } from "@/types/note";
-import { UserNoteApi } from "@/hooks/learn/user-note-api";
-import { addToast } from "@heroui/toast";
+import apiService from "@/service/api"; // Assuming your global API service
+import { Note, NoteInput } from "@/types/note"; // Assuming these types are correct
+import { addToast } from "@heroui/toast"; // Assuming this is imported globally
 
 interface NoteSectionProps {
   questionId: number;
 }
 
+// ⭐️ The base endpoint for notes
+const NOTES_ENDPOINT = "/user-notes";
+
 export default function NoteSection({ questionId }: NoteSectionProps) {
-  const [notes, setNotes] = useState<Note[]>([]);
+  const queryClient = useQueryClient();
+  const notesQueryKey = ["userNotes", questionId];
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  console.log("note", notes);
+  // ---------------------------------------------------
+  // 1. FETCH NOTES (useQuery)
+  // ---------------------------------------------------
+  const { data: notes, isLoading } = useQuery<Note[]>({
+    queryKey: notesQueryKey,
+    queryFn: async () => {
+      // Endpoint: GET /api/user-notes?questionId=X
+      const res = await apiService.get<Note[]>(NOTES_ENDPOINT, { questionId });
+      // Assuming the API returns the array directly in res.data
+      return res.data;
+    },
+    enabled: !!questionId,
+  });
 
-  const api = UserNoteApi();
-  // 🧠 Load notes from backend when component mounts
-  useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        setLoading(true);
-        const res = await api.getMyQuestionNotes({
-          questionId,
+  // ---------------------------------------------------
+  // 2. DELETE NOTE (useMutation)
+  // ---------------------------------------------------
+  const deleteMutation = useMutation({
+    // Endpoint: DELETE /api/user-notes/:id
+    mutationFn: (noteId: number) => apiService.delete(`${NOTES_ENDPOINT}/${noteId}`),
+    onSuccess: () => {
+      // Invalidate the query to force a fresh fetch and UI update
+      queryClient.invalidateQueries({ queryKey: notesQueryKey });
+      addToast({ title: "Deleted", description: "Note deleted successfully", color: "success" });
+    },
+    onError: (err: any) => {
+      console.error("Delete failed:", err);
+      addToast({ title: "Error", description: "Failed to delete note", color: "danger" });
+    },
+  });
+
+  // ---------------------------------------------------
+  // 3. CREATE/UPDATE NOTE (useMutation) - Single function for both
+  // ---------------------------------------------------
+  const saveMutation = useMutation({
+    mutationFn: async (noteData: NoteInput) => {
+      if (noteData.id) {
+        // UPDATE (PATCH/PUT)
+        // Endpoint: PATCH /api/user-notes/:id
+        return apiService.patch<Note>(`${NOTES_ENDPOINT}/${noteData.id}`, {
+          note: noteData.note, // Only sending fields that are updated
         });
-        setNotes(res);
-      } catch (err) {
-        console.error("Failed to load notes:", err);
-        addToast({ title: "Error", description: "Failed to load notes" });
-      } finally {
-        setLoading(false);
+      } else {
+        // CREATE (POST)
+        // Endpoint: POST /api/user-notes
+        const payload = {
+          // ⚠️ NOTE: You must replace '1' with actual dynamic values
+          userId: 1, 
+          questionId: questionId, // Use prop here
+          title: noteData.title,
+          note: noteData.note,
+        };
+        return apiService.post<Note>(NOTES_ENDPOINT, payload);
       }
-    };
+    },
+    onSuccess: (response, noteData) => {
+      // Invalidate query to refresh list
+      queryClient.invalidateQueries({ queryKey: notesQueryKey });
+      
+      const successTitle = noteData.id ? "Updated" : "Created";
+      const successDescription = noteData.id ? "Note updated successfully" : "Note added successfully";
+      
+      addToast({ title: successTitle, description: successDescription, color: "success" });
+      
+      // Close modal and clear selection
+      setIsModalOpen(false);
+      setSelectedNote(null);
+    },
+    onError: (err: any) => {
+      console.error("Save failed:", err);
+      addToast({ title: "Error", description: "Failed to save note", color: "danger" });
+    },
+  });
 
-    fetchNotes();
-  }, []);
+  // ---------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------
 
   // 🗑 Delete note
-  const handleDelete = async (id: number) => {
-    try {
-      await api.deleteUserNote(id);
-      setNotes((prev) => prev.filter((note) => note.id !== id));
-      addToast({ title: "Deleted", description: "Note deleted successfully" });
-    } catch (err) {
-      console.error("Delete failed:", err);
-      addToast({ title: "Error", description: "Failed to delete note" });
-    }
+  const handleDelete = (id: number) => {
+    deleteMutation.mutate(id);
   };
 
   // ✏️ Edit note
   const handleEdit = (id: number) => {
-    const note = notes.find((n) => n.id === id) || null;
+    const note = notes?.find((n) => n.id === id) || null;
     setSelectedNote(note);
     setIsModalOpen(true);
   };
@@ -70,47 +121,34 @@ export default function NoteSection({ questionId }: NoteSectionProps) {
 
   // 💾 Save (create or update)
   const handleSave = async (note: NoteInput) => {
-    try {
-      if (note.id) {
-        // Update existing
-        const updated = await api.updateUserNote(note.id, {
-          // title: note.title,
-          note: note.note,
-        });
-        setNotes((prev) => prev.map((n) => (n.id === note.id ? updated : n)));
-        addToast({
-          title: "Updated",
-          description: "Note updated successfully",
-        });
-      } else {
-        // Create new
-        const created = await api.createUserNote({
-          userId: 1, // dynamic from auth
-          questionId: 1, // dynamic current question
-          title: note.title,
-          note: note.note,
-        });
-
-        setNotes((prev) => [...prev, created]);
-        addToast({ title: "Created", description: "Note added successfully" });
-      }
-    } catch (err) {
-      console.error("Save failed:", err);
-      addToast({ title: "Error", description: "Failed to save note" });
-    }
+    saveMutation.mutate(note);
   };
+
+  // ---------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------
+  if (isLoading) {
+    return (
+      <div className="p-6 text-center text-gray-500">Loading notes...</div>
+    );
+  }
 
   return (
     <div className="w-full mx-auto p-6 rounded-2xl border border-gray-200">
       <h1 className="text-2xl font-bold mb-6">My Notes</h1>
 
       {/* List */}
-      <NoteList notes={notes} onDelete={handleDelete} onEdit={handleEdit} />
+      <NoteList 
+        notes={notes || []} 
+        onDelete={handleDelete} 
+        onEdit={handleEdit} 
+      />
 
       {/* Floating Plus Button */}
       <button
         className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700"
         onClick={handleAdd}
+        disabled={saveMutation.isPending || deleteMutation.isPending}
       >
         <Plus className="w-6 h-6" />
       </button>
@@ -124,6 +162,7 @@ export default function NoteSection({ questionId }: NoteSectionProps) {
           setSelectedNote(null);
         }}
         onSave={handleSave}
+        isSaving={saveMutation.isPending}
       />
     </div>
   );

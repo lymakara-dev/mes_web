@@ -15,6 +15,4 @@ export type QuestionAnswer = {
   answers: Answer[];
 };
 
-export type QuestionCardProps = {
-  question: QuestionAnswer;
-};
+export type Question = QuestionAnswer;

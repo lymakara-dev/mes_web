@@ -1,44 +1,73 @@
 import api from "@/service/api";
 import { User } from "@/types/user";
+import Cookies from "js-cookie"; // 👈 Import Cookies to manage the token
+
+// Define a minimal response structure for login
+interface LoginResponse {
+  accessToken: string;
+  user: User;
+}
 
 export function AuthApi() {
   return {
-    login: async (username: string, password: string) => {
-      const res = await api.post("/auth/sign-in", {
-        username,
+    /**
+     * Handles user login. Saves the token to a cookie for the ApiService interceptor.
+     */
+    login: async (email: string, password: string): Promise<User> => {
+      // 1. Send login request
+      // api.post returns the full AxiosResponse, so we extract .data.
+      const res = await api.post<LoginResponse>("/auth/login", {
+        email,
         password,
       });
 
       console.log("user res", res);
       const { accessToken, user } = res.data;
 
-      // Save token to localStorage for persistence
-      localStorage.setItem("token", accessToken);
+      // 2. ⭐️ CRITICAL FIX: Save token to Cookies so the ApiService interceptor picks it up. ⭐️
+      // This key MUST match the one used in your ApiService interceptor ("auth_token").
+      Cookies.set("auth_token", accessToken, {
+        expires: 7,
+        secure: true,
+        sameSite: "Strict",
+      });
 
-      // Set token in axios headers
-      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+      // ❌ Removed: localStorage.setItem("token", accessToken);
+      // ❌ Removed: api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
       return user;
     },
 
-    register: async (name: string, email: string, password: string) => {
+    /**
+     * Handles user registration.
+     * api.post returns the full AxiosResponse, so we extract .data.
+     */
+    register: async (
+      name: string,
+      email: string,
+      password: string,
+    ): Promise<any> => {
       const res = await api.post("/auth/register", { name, email, password });
       return res.data;
     },
 
+    /**
+     * Fetches the authenticated user's profile.
+     * ❌ Manual token setting REMOVED. Auth is handled by the ApiService interceptor.
+     */
     getProfile: async (): Promise<User> => {
-      // Ensure the token is set (in case of page reload)
-      const token = localStorage.getItem("token");
-      if (token) {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      }
-
       // Call the protected endpoint
-      const res = await api.get("/auth/profile");
+      // api.get returns the full AxiosResponse, so we extract .data.
+      const res = await api.get<User>("/auth/profile");
       console.log("profile", res.data);
       return res.data;
     },
 
+    /**
+     * Updates the authenticated user's profile.
+     * ❌ Manual token setting REMOVED. Auth is handled by the ApiService interceptor.
+     * api.patch is assumed to return the data (T) directly.
+     */
     updateProfile: async (payload: {
       username?: string;
       firstName?: string;
@@ -47,18 +76,20 @@ export function AuthApi() {
       phone?: string;
       gender?: string;
     }): Promise<User> => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      }
-
-      const res = await api.patch("auth/profile", payload);
-      return res.data;
+      // api.patch returns the data directly
+      const data = await api.patch<User>("auth/profile", payload);
+      return data;
     },
 
+    /**
+     * Logs the user out by removing the token from the cookies.
+     */
     logout: () => {
-      localStorage.removeItem("token");
-      delete api.defaults.headers.common["Authorization"];
+      // ⭐️ CRITICAL FIX: Remove token from Cookies, not localStorage. ⭐️
+      Cookies.remove("auth_token");
+
+      // ❌ Removed: localStorage.removeItem("token");
+      // ❌ Removed: delete api.defaults.headers.common["Authorization"];
     },
   };
 }

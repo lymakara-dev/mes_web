@@ -1,4 +1,5 @@
 import api from "@/service/api";
+import { AxiosResponse } from "axios";
 
 export interface Answer {
   id: number;
@@ -9,15 +10,24 @@ export interface Answer {
   fileUrl?: string;
 }
 
+const ANSWERS_ENDPOINT = "/answers";
+
 export function AnswerApi() {
   return {
+    // Fetches answers for a specific question.
+    // api.get returns the full AxiosResponse, so we extract .data.
     getByQuestion: async (questionId: number): Promise<Answer[]> => {
-      const res = await api.get("/answers/question", {
-        params: { questionId },
-      });
+      const res: AxiosResponse<Answer[]> = await api.get(
+        `${ANSWERS_ENDPOINT}/question`,
+        {
+          params: { questionId },
+        },
+      );
       return res.data;
     },
 
+    // Creates a new answer, supporting file upload (multipart).
+    // ⭐️ Uses the dedicated api.upload (POST) ⭐️
     create: async (
       questionId: number,
       content: string,
@@ -30,14 +40,19 @@ export function AnswerApi() {
       formData.append("content", content);
       formData.append("contentType", contentType);
       formData.append("isCorrect", String(isCorrect));
-      if (file) formData.append("file", file);
+      if (file) formData.append("file", file); // Assuming backend expects 'file'
 
-      const res = await api.post("/answers", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return res.data;
+      // Use api.upload (POST), which handles FormData and headers correctly
+      const res: AxiosResponse<Answer> = await api.upload(
+        ANSWERS_ENDPOINT,
+        formData,
+        "POST",
+      );
+      return res.data; // api.upload returns full response
     },
 
+    // Updates an existing answer, supporting file upload (multipart).
+    // ⭐️ Uses the dedicated api.upload (PATCH) ⭐️
     update: async (
       id: number,
       content: string,
@@ -49,16 +64,22 @@ export function AnswerApi() {
       formData.append("content", content);
       formData.append("contentType", contentType);
       formData.append("isCorrect", String(isCorrect));
-      if (file) formData.append("file", file);
+      if (file) formData.append("file", file); // Assuming backend expects 'file'
 
-      const res = await api.patch(`/answers/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return res.data;
+      // Use api.upload (PATCH), which handles FormData and headers correctly
+      const res: AxiosResponse<Answer> = await api.upload(
+        `${ANSWERS_ENDPOINT}/${id}`,
+        formData,
+        "PATCH",
+      );
+      return res.data; // api.upload returns full response
     },
 
+    // Deletes an answer.
+    // ⭐️ Uses api.delete, which returns the data (T) directly ⭐️
     remove: async (id: number): Promise<void> => {
-      await api.delete(`/answers/${id}`);
+      // api.delete returns the response body directly, pass {} as payload for consistency
+      await api.delete<void>(`${ANSWERS_ENDPOINT}/${id}`, {});
     },
   };
 }

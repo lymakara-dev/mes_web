@@ -1,38 +1,48 @@
 import api from "@/service/api";
+import { AxiosResponse } from "axios";
+
+// Define a basic interface for the UserNote
+export interface UserNote {
+  id: number;
+  userId: number;
+  questionId: number;
+  title: string;
+  note: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const USER_NOTES_ENDPOINT = "/user-notes";
 
 export function UserNoteApi() {
-  // Helper to attach token automatically
-  const setAuthHeader = () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
-  };
+  // ❌ REMOVED: setAuthHeader and manual token logic. 
+  // Authentication is handled automatically by the apiService interceptor.
 
   return {
     // Create a user note
+    // api.post returns the full AxiosResponse, so we extract .data
     createUserNote: async (payload: {
       userId: number;
       questionId: number;
       title: string;
       note: string;
-    }) => {
-      setAuthHeader();
-      const res = await api.post("/user-notes", payload);
+    }): Promise<UserNote> => {
+      const res: AxiosResponse<UserNote> = await api.post(USER_NOTES_ENDPOINT, payload);
       return res.data;
     },
 
     // Get all user notes (admin/public)
-    getAllUserNote: async () => {
-      const res = await api.get("/user-notes");
+    // api.get returns the full AxiosResponse, so we extract .data
+    getAllUserNote: async (): Promise<UserNote[]> => {
+      const res: AxiosResponse<UserNote[]> = await api.get(USER_NOTES_ENDPOINT);
       return res.data;
     },
 
     // Get notes belonging to the authenticated user & a specific question
-    getMyQuestionNotes: async (query: { questionId: number }) => {
-      setAuthHeader();
-      const res = await api.get("/user-notes/my-question-notes", {
-        params: query,
+    // api.get returns the full AxiosResponse, so we extract .data
+    getMyQuestionNotes: async (query: { questionId: number }): Promise<UserNote[]> => {
+      const res: AxiosResponse<UserNote[]> = await api.get(`${USER_NOTES_ENDPOINT}/my-question-notes`, {
+        params: query, // Pass the query object as params
       });
 
       console.log("my note", res.data);
@@ -40,28 +50,30 @@ export function UserNoteApi() {
     },
 
     // Get a single note by ID
-    getUserNoteById: async (id: number) => {
-      const res = await api.get(`/user-notes/${id}`);
+    // api.get returns the full AxiosResponse, so we extract .data
+    getUserNoteById: async (id: number): Promise<UserNote> => {
+      const res: AxiosResponse<UserNote> = await api.get(`${USER_NOTES_ENDPOINT}/${id}`);
       return res.data;
     },
 
-    // Update a user note (requires auth)
+    // Update a user note
+    // api.patch is assumed to return the data (T) directly
     updateUserNote: async (
       id: number,
       payload: {
         note?: string;
       },
-    ) => {
-      setAuthHeader();
-      const res = await api.patch(`/user-notes/${id}`, payload);
-      return res.data;
+    ): Promise<UserNote> => {
+      const data: UserNote = await api.patch(`${USER_NOTES_ENDPOINT}/${id}`, payload);
+      return data;
     },
 
-    // Delete a user note (optional: could require auth)
-    deleteUserNote: async (id: number) => {
-      setAuthHeader();
-      const res = await api.delete(`/user-notes/${id}`);
-      return res.data;
+    // Delete a user note
+    // api.delete is assumed to return the data (T/unknown) directly
+    deleteUserNote: async (id: number): Promise<unknown> => {
+      // api.delete returns the response body directly, pass {} as payload for consistency
+      const data = await api.delete<unknown>(`${USER_NOTES_ENDPOINT}/${id}`, {});
+      return data;
     },
   };
 }

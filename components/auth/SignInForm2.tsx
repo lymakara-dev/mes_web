@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/field";
 
 type Inputs = {
-  email: string;
+  login: string;
   password: string;
 };
 
@@ -70,15 +70,15 @@ export const LoginForm2 = ({
                   placeholder="you@example.com"
                   className={cn(
                     "pl-9",
-                    errors.email &&
+                    errors.login &&
                       "border-destructive focus-visible:ring-destructive",
                   )}
-                  {...register("email", { required: "Email is required" })}
+                  {...register("login", { required: "login is required" })}
                 />
               </div>
-              {errors.email && (
+              {errors.login && (
                 <p className="text-xs text-destructive mt-1">
-                  {errors.email.message}
+                  {errors.login.message}
                 </p>
               )}
             </Field>

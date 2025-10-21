@@ -39,7 +39,7 @@ interface IPaginatedSchools {
   rows: School[];
 }
 
-const schoolApi = SchoolApi(); 
+const schoolApi = SchoolApi();
 
 // --- School Modal Component ---
 
@@ -118,13 +118,21 @@ const SchoolModal = ({
               <Input
                 type="file"
                 label={isEditing ? "Change Logo (Optional)" : "School Logo"}
-                onChange={(e) =>
-                  e.target.files && setFile(e.target.files[0])
-                }
+                onChange={(e) => e.target.files && setFile(e.target.files[0])}
                 isRequired={!isEditing}
               />
               {isEditing && initialData?.logoUrl && (
-                <p className="text-sm text-gray-500">Current Logo: <a href={initialData.logoUrl} target="_blank" rel="noopener noreferrer" className="text-primary-500 underline">View</a></p>
+                <p className="text-sm text-gray-500">
+                  Current Logo:{" "}
+                  <a
+                    href={initialData.logoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-500 underline"
+                  >
+                    View
+                  </a>
+                </p>
               )}
             </ModalBody>
             <ModalFooter>
@@ -146,7 +154,6 @@ const SchoolModal = ({
     </Modal>
   );
 };
-
 
 // --- Table Setup ---
 
@@ -269,15 +276,18 @@ export default function SchoolManagementPage() {
   const handleFormSubmit = (id: number | null, name: string, file?: File) => {
     processSchool({ id, name, file });
   };
-  
+
   // --- Client-side Filtering, Sorting, and Pagination ---
   const filteredItems = useMemo(() => {
     let filteredSchools = [...schoolsData];
 
     if (debouncedFilterValue) {
-      filteredSchools = filteredSchools.filter((school) =>
-        school.name.toLowerCase().includes(debouncedFilterValue.toLowerCase()) || 
-        school.id.toString().includes(debouncedFilterValue)
+      filteredSchools = filteredSchools.filter(
+        (school) =>
+          school.name
+            .toLowerCase()
+            .includes(debouncedFilterValue.toLowerCase()) ||
+          school.id.toString().includes(debouncedFilterValue),
       );
     }
     return filteredSchools;
@@ -292,7 +302,7 @@ export default function SchoolManagementPage() {
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, filteredItems]);
-  
+
   const totalSchools = sortedItems.length;
   const paginatedItems = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -304,7 +314,7 @@ export default function SchoolManagementPage() {
     count: totalSchools,
     rows: paginatedItems,
   };
-  
+
   // --- Table Content Helpers ---
 
   const headerColumns = useMemo(() => {
@@ -473,7 +483,7 @@ export default function SchoolManagementPage() {
         isLoading={isProcessing}
         initialData={activeSchool}
       />
-      
+
       <ConfirmationModal
         isOpen={isConfirmOpen}
         onOpenChange={onConfirmOpenChange}

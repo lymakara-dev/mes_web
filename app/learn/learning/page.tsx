@@ -4,8 +4,10 @@ import Link from "next/link";
 
 import MyCard from "@/components/common/Card";
 import { useApi } from "@/service/useApi";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { School } from "@/types/school";
+import { AxiosError } from "axios";
+import apiService from "@/service/api";
 
 const mockUniversities = [
   {
@@ -47,11 +49,20 @@ const mockUniversities = [
 ];
 
 export default function LearningPage() {
-  const { getSchools } = useApi();
+  const queryClient = useQueryClient();
 
-  const { data, isLoading, isError } = useQuery<School[]>({
-    queryKey: ["schools"],
-    queryFn: getSchools,
+  const queryKey = ["school"];
+
+  const {
+    data: schools,
+    isLoading,
+    isError,
+  } = useQuery<School[], AxiosError>({
+    queryKey: queryKey,
+    queryFn: async () => {
+      const res = await apiService.get<School>(`/schools`);
+      return res.data;
+    },
   });
 
   if (isLoading) return <p>Loading...</p>;
@@ -59,7 +70,7 @@ export default function LearningPage() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4 bg-white dark:bg-gray-900 transition-colors">
-      {data?.map((s) => (
+      {schools?.map((s) => (
         <Link key={s.id} href={`/learn/learning/${s.id}`}>
           <MyCard image={s.logoUrl} subjects={s.subjectCount} title={s.name} />
         </Link>

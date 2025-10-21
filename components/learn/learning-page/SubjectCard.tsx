@@ -60,7 +60,7 @@ export default function SubjectCard({
             value={progress}
           />
           <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-            {progress}%
+            {Math.round(progress)}%
           </p>
         </div>
       </div>
