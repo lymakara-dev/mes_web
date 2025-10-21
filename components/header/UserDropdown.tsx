@@ -17,7 +17,7 @@ export default function UserDropdown() {
 
   const handleLogout = () => {
     logout(); // remove token
-    router.push("/learn/signin"); // redirect
+    router.push("/auth/login"); // redirect
   };
 
   const { data, isLoading, isError } = useQuery<User>({

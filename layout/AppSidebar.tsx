@@ -47,11 +47,11 @@ const learnNavItems: NavItem[] = [
 ];
 
 const adminNavItems: NavItem[] = [
-  // {
-  //   icon: <UserCircleIcon className="w-6 h-6" />,
-  //   name: "Dashboard",
-  //   path: "/learn/admin/dashboard",
-  // },
+  {
+    icon: <UserCircleIcon className="w-6 h-6" />,
+    name: "Dashboard",
+    path: "/learn/admin/dashboard",
+  },
   {
     icon: <UserCircleIcon className="w-6 h-6" />,
     name: "User",

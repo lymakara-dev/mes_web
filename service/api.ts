@@ -29,9 +29,9 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       clearToken();
 
-      if (window.location.pathname !== "/learn/signin") {
-        window.location.href = "/learn/signin";
-      }
+      // if (window.location.pathname !== "/auth/login") {
+      //   window.location.href = "/auth/login";
+      // }
     }
 
     return Promise.reject(err);

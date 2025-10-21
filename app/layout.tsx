@@ -9,6 +9,7 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { AuthProvider } from "@/hooks/api-hooks/useAuth";
 
 export const metadata: Metadata = {
   title: {
@@ -45,16 +46,17 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <ThemeProvider>
             <SidebarProvider>
-              <APIProviders>
-                <div className="relative flex flex-col h-screen">
-                  {/* <Navbar /> */}
-                  {/* <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">s
+              <AuthProvider>
+                <APIProviders>
+                  <div className="relative flex flex-col h-screen">
+                    {/* <Navbar /> */}
+                    {/* <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">s
                 {children}
               </main> */}
-                  <main className="w-screen mx-auto flex-grow overflow-x-hidden">
-                    {children}
-                  </main>
-                  {/* <footer className="w-full flex items-center justify-center py-3">
+                    <main className="w-screen mx-auto flex-grow overflow-x-hidden">
+                      {children}
+                    </main>
+                    {/* <footer className="w-full flex items-center justify-center py-3">
                     <Link
                       isExternal
                       className="flex items-center gap-1 text-current"
@@ -65,8 +67,9 @@ export default function RootLayout({
                       <p className="text-primary">HeroUI</p>
                     </Link>
                   </footer> */}
-                </div>
-              </APIProviders>
+                  </div>
+                </APIProviders>
+              </AuthProvider>
             </SidebarProvider>
           </ThemeProvider>
         </Providers>

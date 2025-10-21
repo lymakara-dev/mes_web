@@ -84,3 +84,11 @@ export interface School {
 // SchoolApi().create(name: string, file: File): Promise<School>;
 // SchoolApi().update(id: number, name: string, file?: File): Promise<School>;
 // SchoolApi().remove(id: number): Promise<void>;
+
+export interface AdminStats {
+  totalUsers: number;
+  totalSchools: number;
+  totalSubjects: number;
+  totalQuestions: number;
+  totalReports: number;
+}
