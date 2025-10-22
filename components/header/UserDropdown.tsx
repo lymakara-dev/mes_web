@@ -1,66 +1,67 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { useQuery, useMutation } from "@tanstack/react-query"; // Import useMutation
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; // Import useMutation and useQueryClient
 import { useRouter } from "next/navigation";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Button } from "@heroui/button";
 import { User } from "@/types/user";
+import apiService from "@/service/api";
 
-// ⚠️ ASSUME: A global API service is available here
-import apiService from "@/service/api"; 
-
-// ⭐️ ENDPOINTS ⭐️
 const PROFILE_ENDPOINT = "/auth/profile";
-const LOGOUT_ENDPOINT = "/auth/logout"; // Assuming standard logout endpoint
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  // ---------------------------------------------------
-  // 1. FETCH PROFILE (useQuery) - Replaces getProfile()
-  // ---------------------------------------------------
   const { data, isLoading, isError } = useQuery<User>({
     queryKey: ["getProfile"],
     queryFn: async () => {
-      // Endpoint: GET /api/auth/profile
       const res = await apiService.get<User>(PROFILE_ENDPOINT);
-      // Assuming res.data is the User object or the User object is nested
-      return res.data; 
+      return res.data;
     },
-    // Prevent the query from retrying/showing error if the user is unauthenticated
-    retry: false, 
+    retry: false,
   });
-  
+
   // ---------------------------------------------------
-  // 2. LOGOUT MUTATION - Replaces logout()
+  // 2. LOGOUT MUTATION - CLIENT-SIDE ONLY
   // ---------------------------------------------------
+  // In UserDropdown.tsx
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      // Endpoint: POST /api/auth/logout (Assuming a POST to invalidate session)
-      // This call might fail if the server is down, but we proceed with token removal anyway
-      try {
-        await apiService.post(LOGOUT_ENDPOINT, {});
-      } catch (e) {
-        console.warn("Server logout failed, proceeding with client-side token removal.");
-      }
-      
-      // Client-side cleanup (Remove token/auth state, typically done in apiService or auth context)
-      // Since the original logout() was simple, we replicate the side effect here:
+      // Keep only client-side cleanup here
       if (typeof window !== "undefined") {
-          localStorage.removeItem("token"); // Placeholder for actual token storage
+        localStorage.removeItem("token");
+        document.cookie =
+          "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       }
-      return true; // Return a success status regardless of server response
+      return true;
     },
-    onSuccess: () => {
-      router.push("/auth/login"); // Redirect after client/server cleanup
+    // ⭐️ FIX: Use onSettled for cache cleanup AND immediate navigation
+    onSettled: () => {
+      // 1. Remove the query from the cache
+      queryClient.removeQueries({ queryKey: ["getProfile"] });
+
+      // 2. Close dropdown
+      setIsOpen(false);
+
+      // 3. Navigate immediately (router.replace is good for auth changes)
+      // This happens so fast the failing background query is often suppressed.
+      router.replace("/auth/login");
     },
   });
 
+  useEffect(() => {
+    if (!isLoading && (isError || !data)) {
+      // Prevents the "Cannot update a component while rendering" error
+      router.replace("/auth/login");
+    }
+  }, [isLoading, isError, data, router]);
+
   const handleLogout = () => {
-    logoutMutation.mutate(); // Trigger the mutation
+    logoutMutation.mutate();
   };
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -71,26 +72,25 @@ export default function UserDropdown() {
   function closeDropdown() {
     setIsOpen(false);
   }
-  
+
   // Handle loading and error states for profile data
   if (isLoading) {
-      // You might return a skeleton or a disabled button here
-      return (
-          <div className="flex items-center space-x-2 animate-pulse">
-              <div className="rounded-full bg-gray-300 h-11 w-11"></div>
-              <div className="h-4 bg-gray-300 rounded w-20"></div>
-          </div>
-      );
+    // You might return a skeleton or a disabled button here
+    return (
+      <div className="flex items-center space-x-2 animate-pulse">
+        <div className="rounded-full bg-gray-300 h-11 w-11"></div>
+        <div className="h-4 bg-gray-300 rounded w-20"></div>
+      </div>
+    );
   }
-  
-  // If no data or an error occurred (e.g., user is unauthenticated), 
-  // you might choose to show a fallback or redirect to login.
+
+  // If no data or an error occurred (e.g., user is unauthenticated),
+  // redirect to login.
   if (isError || !data) {
-      return (
-          <Button onClick={() => router.push("/auth/login")}>
-              Login
-          </Button>
-      );
+    // Redirect unauthenticated users to login immediately upon loading the component.
+    // This is a common pattern for components that require authentication.
+    router.replace("/auth/login");
+    return null; // Don't render anything while redirecting
   }
 
   // Use the fetched data for rendering
@@ -100,7 +100,7 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
         onClick={toggleDropdown}
         // Disable button while logging out
-        disabled={logoutMutation.isPending} 
+        disabled={logoutMutation.isPending}
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
           <Image
@@ -183,7 +183,7 @@ export default function UserDropdown() {
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300 disabled:opacity-50"
           onClick={handleLogout}
           // Disable button while logging out
-          disabled={logoutMutation.isPending} 
+          disabled={logoutMutation.isPending}
         >
           {/* Sign out Icon SVG */}
           <svg

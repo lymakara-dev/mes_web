@@ -130,7 +130,9 @@ export default function QuestionForm({
           }
         >
           <SelectItem key="TEXT">TEXT</SelectItem>
+          <SelectItem key="LATEX">LATEX</SelectItem>
           <SelectItem key="IMAGE">IMAGE</SelectItem>
+          <SelectItem key="VIDEO">VIDEO</SelectItem>
         </Select>
 
         <Input

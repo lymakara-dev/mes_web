@@ -39,7 +39,7 @@ export default function ManageQuestionsPage() {
   const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
   // ✨ NEW STATE: Controls the visibility of the form
-  const [isFormOpen, setIsFormOpen] = useState(false); 
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   // --- Invalidation Functions ---
   const invalidateQuestions = () => {
@@ -55,48 +55,37 @@ export default function ManageQuestionsPage() {
   };
 
   // 1. Fetch Questions
-  const { 
-    data: questions = [], 
+  const {
+    data: questions = [],
     isLoading: isQuestionsLoading,
-    error: questionsError
-  } = useQuery<
-    Question[],
-    Error,      
-    Question[]
-  >({
+    error: questionsError,
+  } = useQuery<Question[], Error, Question[]>({
     queryKey: QUERY_KEYS.questions,
     queryFn: () => questionApi.getAll(),
   });
 
   // 2. Fetch Subjects
-  const { 
-    data: subjects = [], 
+  const {
+    data: subjects = [],
     isLoading: isSubjectsLoading,
-    error: subjectsError
-  } = useQuery<
-    Subject[],
-    Error,     
-    Subject[]
-  >({
+    error: subjectsError,
+  } = useQuery<Subject[], Error, Subject[]>({
     queryKey: QUERY_KEYS.subjects,
     queryFn: () => subjectApi.getAll(),
   });
 
   // 3. Fetch Answers (Conditional fetch based on modal state)
-  const { 
-    data: answers = [], 
+  const {
+    data: answers = [],
     isLoading: isAnswersLoading,
-    error: answersError
-  } = useQuery<
-    Answer[],
-    Error,    
-    Answer[]
-  >({
+    error: answersError,
+  } = useQuery<Answer[], Error, Answer[]>({
     queryKey: QUERY_KEYS.answers(activeQuestionId || 0),
     queryFn: () => answerApi.getByQuestion(activeQuestionId as number),
     enabled: isAnswerModalOpen && activeQuestionId !== null,
   });
 
+  console.log("answer=============", answers);
   // --- Error Handling with useEffect ---
   useEffect(() => {
     if (questionsError) {
@@ -124,10 +113,10 @@ export default function ManageQuestionsPage() {
       questions.find((q: any) => q.id === questionId) || null,
     );
     // If we open the answer modal, close the main form
-    setIsFormOpen(false); 
+    setIsFormOpen(false);
     setIsAnswerModalOpen(true);
   };
-  
+
   // Handler for opening the form for a new question
   const handleCreateNew = () => {
     setSelectedQuestion(null); // Ensure we are in create mode
@@ -144,7 +133,7 @@ export default function ManageQuestionsPage() {
   const handleEditQuestion = (q: Question) => {
     setSelectedQuestion(q);
     setIsFormOpen(true);
-  }
+  };
 
   const handleCloseAnswerModal = () => {
     setIsAnswerModalOpen(false);
@@ -160,10 +149,10 @@ export default function ManageQuestionsPage() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <p className="text-2xl font-bold">Manage Questions & Answers</p>
-        
+
         {/* ✨ NEW BUTTON to open the form */}
-        <Button 
-          color="primary" 
+        <Button
+          color="primary"
           onClick={handleCreateNew}
           className="flex items-center"
         >
@@ -175,17 +164,17 @@ export default function ManageQuestionsPage() {
       {/* ✨ CONDITIONAL RENDERING of the Form */}
       {isFormOpen && (
         <Card className="p-4 space-y-4">
-            <h2 className="text-xl font-semibold mb-4">
-              {selectedQuestion ? "Edit Question" : "Create New Question"}
-            </h2>
-            <QuestionForm
-                subjects={subjects}
-                selectedQuestion={selectedQuestion}
-                setSelectedQuestion={setSelectedQuestion}
-                invalidateQuestions={invalidateQuestions}
-                handleShowAnswers={handleShowAnswers}
-                onCancel={handleCloseForm} // Pass the new cancel handler
-            />
+          <h2 className="text-xl font-semibold mb-4">
+            {selectedQuestion ? "Edit Question" : "Create New Question"}
+          </h2>
+          <QuestionForm
+            subjects={subjects}
+            selectedQuestion={selectedQuestion}
+            setSelectedQuestion={setSelectedQuestion}
+            invalidateQuestions={invalidateQuestions}
+            handleShowAnswers={handleShowAnswers}
+            onCancel={handleCloseForm} // Pass the new cancel handler
+          />
         </Card>
       )}
 

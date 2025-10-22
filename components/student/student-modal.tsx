@@ -107,6 +107,7 @@ export const StudentModal = ({
         username,
         // password needs to be set if not optional, but your DTO has it as optional,
         // though your validation requires it. We'll include it.
+        email,
         password,
         firstname,
         lastname,
@@ -162,11 +163,12 @@ export const StudentModal = ({
                   onValueChange={setEmail}
                   // Email is required if editing, but not needed in the creation payload
                   isRequired={isEditing}
-                  isDisabled={!isEditing}
+                  // isDisabled={!isEditing}
                   placeholder={
-                    isEditing
-                      ? "Enter student's email"
-                      : "Email is set upon account creation"
+                    // isEditing
+                    //   ? "Enter student's email"
+                    //   : "Email is set upon account creation"
+                    "Enter student's email"
                   }
                 />
 

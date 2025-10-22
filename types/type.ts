@@ -34,6 +34,7 @@ export interface IPaginatedStudents {
 // This type remains correct based on your previous creation DTO.
 export interface ICreateStudentPayload {
   username: string;
+  email: string;
   password?: string;
   firstname: string;
   lastname: string;
@@ -77,7 +78,7 @@ export interface School {
   id: number;
   name: string;
   // Assuming a logoUrl for symmetry with Subject
-  logoUrl?: string; 
+  logoUrl?: string;
 }
 // Assumed SchoolApi functions:
 // SchoolApi().getAll(): Promise<School[]>;
