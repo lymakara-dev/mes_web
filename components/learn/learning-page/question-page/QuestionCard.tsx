@@ -53,8 +53,10 @@ export default function QuestionCard({
           <video
             controls
             className="w-full max-h-[400px] rounded"
-            // --- NEW --- Track when video ends
-            onEnded={() => setVideoWatched(true)}
+            // Track when video ends
+            onEnded={() => {
+              setVideoWatched(true), setCanGoNext(true);
+            }}
           >
             <source src={question.content} type="video/mp4" />
             Your browser does not support the video tag.
@@ -94,7 +96,8 @@ export default function QuestionCard({
 
     setIsAnswered(true);
     setSelected(ans.id);
-    setIsCorrectAnswer(ans.isCorrect);
+    setIsCorrectAnswer(true);
+    setCanGoNext(true);
   };
 
   // This function is called when the "Next" button for a video is clicked

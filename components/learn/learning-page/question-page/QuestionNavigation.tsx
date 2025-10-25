@@ -18,6 +18,7 @@ export default function QuestionNavigation({
   onFinish,
   disabledNext,
 }: QuestionNavigationProps) {
+  console.log({ disabledNext });
   return (
     <div className="flex justify-between mt-6">
       {/* Hide Prev button on the first question */}
@@ -35,15 +36,24 @@ export default function QuestionNavigation({
       {/* Change Next button to Finish on the last question */}
       <Button
         disabled={disabledNext}
-        className={`px-4 py-2 flex items-center gap-2 rounded-lg text-white ${
-          currentIndex === total - 1
-            ? "bg-green-600 hover:bg-green-700"
-            : "bg-blue-600 hover:bg-blue-800"
-        }`}
-        onClick={currentIndex === total - 1 ? onFinish : onNext}
+        className={`px-4 py-2 flex items-center gap-2 rounded-lg text-white transition-all duration-200 
+    ${
+      disabledNext
+        ? "bg-gray-400 cursor-not-allowed opacity-70"
+        : currentIndex === total - 1
+          ? "bg-green-600 hover:bg-green-700"
+          : "bg-blue-600 hover:bg-blue-800"
+    }`}
+        onClick={
+          !disabledNext
+            ? currentIndex === total - 1
+              ? onFinish
+              : onNext
+            : undefined
+        }
       >
         {currentIndex === total - 1 ? "Finish" : "Next"}{" "}
-        {currentIndex === total - 1 ? null : <ArrowRight />}
+        {currentIndex === total - 1 || disabledNext ? null : <ArrowRight />}
       </Button>
     </div>
   );

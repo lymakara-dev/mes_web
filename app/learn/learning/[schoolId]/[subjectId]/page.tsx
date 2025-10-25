@@ -181,6 +181,37 @@ export default function QuestionPage() {
   //     </div>
   //   );
 
+  // --- SUBJECT USE QUERY ---
+  const {
+    data: subject,
+    isLoading: isSubjectLoading,
+    isError: isSubjectError,
+  } = useQuery({
+    queryKey: ["subject", subjectId],
+    queryFn: async () => {
+      const res: AxiosResponse<{ id: number; name: string }> =
+        await apiService.get(`/subjects/${subjectIdNumber}`);
+      return res.data;
+    },
+    enabled: isValidSubjectId,
+  });
+
+  if (isSubjectLoading)
+    return (
+      <div className="flex items-center justify-center h-screen text-gray-500">
+        Loading subject...
+      </div>
+    );
+
+  if (isSubjectError || !subject)
+    return (
+      <div className="flex items-center justify-center h-screen text-red-500">
+        Failed to load subject
+      </div>
+    );
+
+  console.log({ canGoNext });
+
   return (
     <div
       ref={containerRef}
@@ -189,6 +220,7 @@ export default function QuestionPage() {
       <Header
         isFullscreen={isFullscreen}
         onToggleFullscreen={toggleFullscreen}
+        subjectName={subject.name}
       />
 
       <div className="w-full h-full flex flex-col gap-5 md:flex-row">

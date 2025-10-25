@@ -28,7 +28,7 @@ export default function QuestionSections({
 
       {/* Conditional Sections */}
       {activeSection === "note" && <NoteSection questionId={question.id} />}
-      {activeSection === "chatbot" && <ChatBotSection />}
+      {activeSection === "chatbot" && <ChatBotSection questionId={question.id}/>}
       {activeSection === "hint" && <HintSection hint={question?.hint || ""} />}
       {activeSection === "report" && <ReportSection questionId={question.id} />}
     </div>

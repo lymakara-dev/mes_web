@@ -30,3 +30,26 @@ export interface IQuestionAnswer {
   hint: string;
   answers: IAnswer[];
 }
+
+// Types matching your NestJS DTOs (optional but recommended)
+export interface InitiateChatPayload {
+  questionId: number;
+}
+export interface SendMessagePayload {
+  message: string;
+}
+export interface RagChatPayload {
+  documentId: string;
+  message: string;
+}
+
+// Response types expected from your backend
+export interface InitiateChatResponse {
+  firstMessage: string;
+}
+export interface SendMessageResponse {
+  response: string;
+}
+export interface RagChatResponse {
+  response: string;
+}

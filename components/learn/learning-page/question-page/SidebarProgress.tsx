@@ -1,9 +1,10 @@
 "use client";
 
+import { IQuestionAnswer } from "@/types/learn-type";
 import { useMemo } from "react";
 
 type SidebarProgressProps = {
-  questions: any;
+  questions: IQuestionAnswer[];
   onSelectQuestion: (index: number) => void;
   currentIndex: number;
 };
@@ -71,7 +72,16 @@ export default function SidebarProgress({
 
             {/* Question content */}
             <span>
-              Lesson{index + 1}: {q.contentType}
+              មេរៀនទី {index + 1}:{" "}
+              {q.contentType === "TEXT"
+                ? "ប្រភេទអត្ថបទ"
+                : q.contentType === "IMAGE"
+                  ? "ប្រភេទរូបភាព"
+                  : q.contentType === "LATEX"
+                    ? "ប្រភេទសំនួរចម្លើយ"
+                    : q.contentType === "VIDEO"
+                      ? "ប្រភេទវីដេអូ"
+                      : ""}
             </span>
           </button>
         ))}
