@@ -3,11 +3,10 @@
 import Link from "next/link";
 
 import MyCard from "@/components/common/Card";
-import { useApi } from "@/service/useApi";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { School } from "@/types/school";
+import { useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import apiService from "@/service/api";
+import { ISchool } from "@/types/learn-type";
 
 const mockUniversities = [
   {
@@ -49,18 +48,16 @@ const mockUniversities = [
 ];
 
 export default function LearningPage() {
-  const queryClient = useQueryClient();
-
   const queryKey = ["school"];
 
   const {
     data: schools,
     isLoading,
     isError,
-  } = useQuery<School[], AxiosError>({
+  } = useQuery<ISchool[], AxiosError>({
     queryKey: queryKey,
     queryFn: async () => {
-      const res = await apiService.get<School>(`/schools`);
+      const res = await apiService.get<ISchool>(`/schools`);
       return res.data;
     },
   });

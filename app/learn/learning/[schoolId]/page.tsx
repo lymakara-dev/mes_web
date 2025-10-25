@@ -1,14 +1,12 @@
 "use client";
 
 import SubjectCard from "@/components/learn/learning-page/SubjectCard";
-// ❌ REMOVED: import { UserProgressApi } from "@/hooks/learn/user-progress-api";
 import apiService from "@/service/api";
-import { Subject } from "@/types/subject";
+import { ISubject } from "@/types/learn-type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useParams, useRouter } from "next/navigation";
 
-// Placeholder for missing context/hooks (assuming they exist elsewhere)
 const addToast = (params: any) =>
   console.log("Toast:", params.title, params.description);
 
@@ -20,17 +18,15 @@ export default function SubjectPage() {
 
   const queryKey = ["sbujects", schoolId];
 
-  // ❌ REMOVED: const { startLearning, resetProgress } = UserProgressApi();
-
   const {
     data: subjects,
     isLoading,
     isError,
     refetch,
-  } = useQuery<Subject[], AxiosError>({
+  } = useQuery<ISubject[], AxiosError>({
     queryKey: queryKey,
     queryFn: async () => {
-      const res = await apiService.get<Subject[]>(`/subjects/school`, {
+      const res = await apiService.get<ISubject[]>(`/subjects/school`, {
         schoolId: schoolId,
       });
       return res.data;
@@ -38,7 +34,6 @@ export default function SubjectPage() {
     enabled: !!schoolId,
   });
 
-  // ⭐️ 1. START LEARNING MUTATION (Renamed for clarity) ⭐️
   const { mutate: startLearningMutation, isPending: isStarting } = useMutation({
     mutationFn: (subjectId: number) => {
       const url = `/user-progress/${subjectId}/start`;
@@ -62,7 +57,6 @@ export default function SubjectPage() {
       }),
   });
 
-  // ⭐️ 2. RESET PROGRESS MUTATION (NEW) ⭐️
   const {
     mutate: resetProgressMutation,
     mutateAsync: resetProgressMutationAsync,
@@ -91,8 +85,6 @@ export default function SubjectPage() {
   const handleStartLearning = async (subjectId: number, progress: number) => {
     try {
       if (progress === 100) {
-        // ⭐️ CALL THE NEWLY DEFINED MUTATION ⭐️
-        // We use .mutateAsync() here to await the completion before moving on.
         await resetProgressMutationAsync(subjectId);
 
         // Clear saved local current question for this subject

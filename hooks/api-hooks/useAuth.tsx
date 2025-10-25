@@ -8,7 +8,7 @@ import {
   ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie"; // <-- Import js-cookie
+import Cookies from "js-cookie";
 
 // Define the shape of the data from your login API
 interface AuthData {

@@ -4,20 +4,16 @@ import Cookies from "js-cookie";
 class ApiService {
   private axiosInstance: AxiosInstance;
   private API_URL = process.env.NEXT_PUBLIC_API_URL || "https://mockexamkh.com";
-  // private API_URL = 'http://localhost:3000'
 
   constructor() {
     this.axiosInstance = axios.create({
-      // baseURL: process.env.NEXT_PUBLIC_API_URL || "https://mockexamkh.com",
       baseURL: this.API_URL,
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    // Optional: Interceptor to add auth tokens or language headers to every request
     this.axiosInstance.interceptors.request.use((config) => {
-      // --- FIX: Retrieve the token from the cookie ---
       const token = Cookies.get("auth_token");
 
       // If the token exists, add it to the Authorization header
@@ -143,11 +139,6 @@ class ApiService {
     }
   }
 
-  // Inside class ApiService { ... } in api.ts
-
-  // ------------------------------------------------------------------
-  // ⭐️ ADD THIS METHOD to your ApiService class ⭐️
-  // ------------------------------------------------------------------
   async upload<T>(
     endpoint: string,
     formData: FormData,
@@ -169,7 +160,6 @@ class ApiService {
       throw error;
     }
   }
-  // ... rest of the class methods ...
 }
 
 // Export a singleton instance of the service

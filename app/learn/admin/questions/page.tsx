@@ -15,6 +15,8 @@ import QuestionForm from "@/components/learn/admin/QuestionForm";
 import QuestionList from "@/components/learn/admin/QuestionList";
 import AnswerModal from "@/components/learn/admin/AnswerModal";
 import DeleteQuestionModal from "@/components/learn/admin/DeleteQuestionModal";
+import apiService from "@/service/api";
+import { useParams } from "next/navigation";
 
 const questionApi = QuestionApi();
 const answerApi = AnswerApi();
@@ -81,10 +83,16 @@ export default function ManageQuestionsPage() {
     error: answersError,
   } = useQuery<Answer[], Error, Answer[]>({
     queryKey: QUERY_KEYS.answers(activeQuestionId || 0),
-    queryFn: () => answerApi.getByQuestion(activeQuestionId as number),
+    queryFn: async () => {
+      const res = await apiService.get(`/answers/question`, {
+        questionId: activeQuestionId,
+      });
+      return res.data;
+    },
     enabled: isAnswerModalOpen && activeQuestionId !== null,
   });
 
+  console.log("answer=============", activeQuestionId);
   console.log("answer=============", answers);
   // --- Error Handling with useEffect ---
   useEffect(() => {

@@ -1,7 +1,8 @@
-import { School } from "./school";
+import { ISchool } from "./learn-type";
+
 
 export type PaginatedSchools = {
-  data: School[];
+  data: ISchool[];
   total: number;
   page: number;
   pageSize: number;

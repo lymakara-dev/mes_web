@@ -8,13 +8,10 @@ import QuestionSections from "@/components/learn/learning-page/question-page/Que
 import SidebarProgress from "@/components/learn/learning-page/question-page/SidebarProgress";
 import Header from "@/components/learn/learning-page/question-page/Header";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import apiService from "@/service/api"; // Assuming the API service instance
+import apiService from "@/service/api";
 import { AxiosError, AxiosResponse } from "axios";
-import { Question } from "@/types/question"; // Assuming a type for Question
+import { IQuestionAnswer } from "@/types/learn-type";
 
-// ❌ REMOVED: useQuestions, UserProgressApi, UserQuestionHistoryApi
-
-// Placeholder for missing toast function
 const addToast = (params: any) =>
   console.log("Toast:", params.title, params.description);
 
@@ -39,6 +36,7 @@ export default function QuestionPage() {
     }
     return 0;
   });
+  const [canGoNext, setCanGoNext] = useState(false);
 
   const isValidSubjectId =
     !!subjectId && !isNaN(subjectIdNumber) && subjectIdNumber > 0;
@@ -48,29 +46,26 @@ export default function QuestionPage() {
     data: questions,
     isLoading,
     isError,
-  } = useQuery<Question[], AxiosError>({
+  } = useQuery<IQuestionAnswer[], AxiosError>({
     queryKey: questionsQueryKey,
     queryFn: async () => {
-      // We use a generic type here temporarily to inspect the response structure
-      const res: AxiosResponse<Question[] | { data: Question[] }> =
-        await apiService.get(`/questions/subject`, {
-          subjectId: subjectIdNumber,
-        });
+      const res: AxiosResponse<
+        IQuestionAnswer[] | { data: IQuestionAnswer[] }
+      > = await apiService.get(`/questions/subject`, {
+        subjectId: subjectIdNumber,
+      });
 
-      // ⭐️ LIKELY FIX: Return res.data if the array is not nested
       if (Array.isArray(res.data)) {
-        return res.data as Question[];
+        return res.data as IQuestionAnswer[];
       }
 
-      // Fallback (if the API response shape is confirmed to be {data: []})
-      return (res.data as { data: Question[] }).data;
+      return (res.data as { data: IQuestionAnswer[] }).data;
     },
     enabled: isValidSubjectId,
   });
 
   // --- 2. UPDATE USER PROGRESS MUTATION ---
   const { mutateAsync: updateProgressMutation } = useMutation({
-    // Endpoint: /api/user-progress/1/update (1 is subjectId)
     mutationFn: (subId: number) =>
       apiService.patch(`/user-progress/${subId}/update`, {}),
     onError: (err: any) =>
@@ -83,7 +78,6 @@ export default function QuestionPage() {
 
   // --- 3. START QUESTION MUTATION ---
   const { mutateAsync: startQuestionMutation } = useMutation({
-    // Endpoint: /api/user/user-question-history/1/start (1 is questionId)
     mutationFn: (questionId: number) =>
       apiService.post(`/user/user-question-history/${questionId}/start`, {}),
     onError: (err: any) => console.error("Start question failed:", err),
@@ -91,7 +85,6 @@ export default function QuestionPage() {
 
   // --- 4. END QUESTION MUTATION ---
   const { mutateAsync: endQuestionMutation } = useMutation({
-    // Endpoint: /api/user/user-question-history/1/end (1 is questionId)
     mutationFn: (questionId: number) =>
       apiService.post(`/user/user-question-history/${questionId}/end`, {}),
     onError: (err: any) => console.error("End question failed:", err),
@@ -108,7 +101,6 @@ export default function QuestionPage() {
 
   // Track start/end of each question
   useEffect(() => {
-    // ⭐️ CRITICAL FIX: Check if the ID is a valid number ⭐️
     if (
       !currentQuestion ||
       typeof currentQuestion.id !== "number" ||
@@ -121,9 +113,6 @@ export default function QuestionPage() {
     startQuestionMutation(currentQuestion.id).catch(console.error);
 
     return () => {
-      // The cleanup function runs on component unmount OR when dependencies change.
-      // We must ensure the ID is valid for the cleanup to run safely.
-      // However, the dependencies will correctly capture the ID from the previous render.
       endQuestionMutation(currentQuestion.id).catch(console.error);
     };
   }, [currentQuestion, startQuestionMutation, endQuestionMutation]);
@@ -132,7 +121,6 @@ export default function QuestionPage() {
   const handleNext = async () => {
     if (!currentQuestion) return;
 
-    // ⭐️ Use new mutation ⭐️
     await endQuestionMutation(currentQuestion.id);
     await updateProgressMutation(subjectIdNumber);
 
@@ -146,7 +134,6 @@ export default function QuestionPage() {
   const handleFinish = async () => {
     if (!currentQuestion) return;
 
-    // ⭐️ Use new mutation ⭐️
     await endQuestionMutation(currentQuestion.id);
     await updateProgressMutation(subjectIdNumber);
 
@@ -161,23 +148,23 @@ export default function QuestionPage() {
     }
   };
 
-  // --- Early returns ---
-  // ... (early returns remain the same)
-  // --- Early returns ---
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-screen text-gray-500">
         Loading questions...
       </div>
     );
+
   if (isError)
     return (
       <div className="flex items-center justify-center h-screen text-red-500">
         Failed to load questions
       </div>
     );
+
   if (!currentQuestion)
     return <p className="p-4 text-gray-500">No questions available</p>;
+
   // if (questions?.every((q: any) => q.status === "completed"))
   //   // Added optional chaining
   //   return (
@@ -206,7 +193,12 @@ export default function QuestionPage() {
 
       <div className="w-full h-full flex flex-col gap-5 md:flex-row">
         <div className="flex flex-col flex-1 gap-5">
-          <QuestionCard question={currentQuestion} />
+          <QuestionCard
+            question={currentQuestion}
+            onNext={handleNext}
+            onSubmitAnswer={() => {}}
+            setCanGoNext={setCanGoNext}
+          />
 
           <QuestionNavigation
             currentIndex={currentIndex}
@@ -214,6 +206,7 @@ export default function QuestionPage() {
             onPrev={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}
             onNext={handleNext}
             onFinish={handleFinish}
+            disabledNext={!canGoNext}
           />
 
           <QuestionSections

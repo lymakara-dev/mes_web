@@ -7,6 +7,7 @@ type QuestionNavigationProps = {
   onPrev: () => void;
   onNext: () => void;
   onFinish: () => void;
+  disabledNext?: boolean;
 };
 
 export default function QuestionNavigation({
@@ -15,6 +16,7 @@ export default function QuestionNavigation({
   onPrev,
   onNext,
   onFinish,
+  disabledNext,
 }: QuestionNavigationProps) {
   return (
     <div className="flex justify-between mt-6">
@@ -32,6 +34,7 @@ export default function QuestionNavigation({
 
       {/* Change Next button to Finish on the last question */}
       <Button
+        disabled={disabledNext}
         className={`px-4 py-2 flex items-center gap-2 rounded-lg text-white ${
           currentIndex === total - 1
             ? "bg-green-600 hover:bg-green-700"

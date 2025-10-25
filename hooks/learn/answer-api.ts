@@ -1,4 +1,5 @@
 import api from "@/service/api";
+import { darkLayout } from "@heroui/react";
 import { AxiosResponse } from "axios";
 
 export interface Answer {
@@ -23,6 +24,8 @@ export function AnswerApi() {
           params: { questionId },
         },
       );
+
+      console.log("========answer", res.data);
       return res.data;
     },
 
