@@ -41,6 +41,21 @@ export default function QuestionPage() {
   const isValidSubjectId =
     !!subjectId && !isNaN(subjectIdNumber) && subjectIdNumber > 0;
 
+  // --- SUBJECT USE QUERY ---
+  const {
+    data: subject,
+    isLoading: isSubjectLoading,
+    isError: isSubjectError,
+  } = useQuery({
+    queryKey: ["subject", subjectId],
+    queryFn: async () => {
+      const res: AxiosResponse<{ id: number; name: string }> =
+        await apiService.get(`/subjects/${subjectIdNumber}`);
+      return res.data;
+    },
+    enabled: isValidSubjectId,
+  });
+
   // --- 1. QUESTIONS USE QUERY ---
   const {
     data: questions,
@@ -148,6 +163,22 @@ export default function QuestionPage() {
     }
   };
 
+  if (isSubjectLoading)
+    return (
+      <div className="flex items-center justify-center h-screen text-gray-500">
+        Loading subject...
+      </div>
+    );
+
+  if (isSubjectError || !subject)
+    return (
+      <div className="flex items-center justify-center h-screen text-red-500">
+        Failed to load subject
+      </div>
+    );
+
+  console.log({ canGoNext });
+
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-screen text-gray-500">
@@ -180,37 +211,6 @@ export default function QuestionPage() {
   //       </button>
   //     </div>
   //   );
-
-  // --- SUBJECT USE QUERY ---
-  const {
-    data: subject,
-    isLoading: isSubjectLoading,
-    isError: isSubjectError,
-  } = useQuery({
-    queryKey: ["subject", subjectId],
-    queryFn: async () => {
-      const res: AxiosResponse<{ id: number; name: string }> =
-        await apiService.get(`/subjects/${subjectIdNumber}`);
-      return res.data;
-    },
-    enabled: isValidSubjectId,
-  });
-
-  if (isSubjectLoading)
-    return (
-      <div className="flex items-center justify-center h-screen text-gray-500">
-        Loading subject...
-      </div>
-    );
-
-  if (isSubjectError || !subject)
-    return (
-      <div className="flex items-center justify-center h-screen text-red-500">
-        Failed to load subject
-      </div>
-    );
-
-  console.log({ canGoNext });
 
   return (
     <div

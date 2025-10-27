@@ -53,3 +53,12 @@ export interface SendMessageResponse {
 export interface RagChatResponse {
   response: string;
 }
+export interface QuestionHistoryEntry {
+  id: number;
+  userId: number;
+  questionId: number;
+  startTime: string; // ISO date string
+  endTime: string | null; // ISO date string or null if not completed
+  isCorrect: boolean | null;
+  timeTaken: number; // in seconds
+}
