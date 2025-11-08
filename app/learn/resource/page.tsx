@@ -11,7 +11,8 @@ import {
   Download,
   Search,
 } from "lucide-react";
-import { Button, Input, Pagination, addToast } from "@heroui/react";
+// ⭐ ADDED `Select` component
+import { Button, Input, Pagination, addToast, Select } from "@heroui/react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { format } from "date-fns";
 
@@ -27,30 +28,68 @@ export interface IPaginatedDocuments {
 const documentApi = DocumentApi();
 
 // =======================================================
+// ⭐ Mock Data for Filters
+// In a real app, you would fetch this from your API
+// =======================================================
+const documentTypes = [
+  { value: "pdf", label: "PDF" },
+  { value: "image", label: "Image" },
+  { value: "spreadsheet", label: "Spreadsheet" },
+  { value: "archive", label: "Archive" },
+  { value: "other", label: "Other" },
+];
+const schools = [
+  { value: "school-of-engineering", label: "School of Engineering" },
+  { value: "school-of-business", label: "School of Business" },
+  { value: "school-of-arts", label: "School of Arts" },
+];
+const subjects = [
+  { value: "computer-science", label: "Computer Science" },
+  { value: "mathematics", label: "Mathematics" },
+  { value: "finance", label: "Finance" },
+  { value: "history", label: "History" },
+];
+
+// =======================================================
 // ⭐ Resource Page Component (Card Display for Users)
 // =======================================================
 export default function ResourcePage() {
-  // --- Pagination/Filter State (simplified for client use) ---
-  const [filterValue, setFilterValue] = useState("");
+  // --- Pagination/Filter State ---
+  const [filterValue, setFilterValue] = useState(""); // For text search
+  // ⭐ ADDED state for new dropdown filters
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [selectedSchool, setSelectedSchool] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+
   const [rowsPerPage] = useState(12); // Fixed row size for the grid display
   const [sortDescriptor] = useState({
-    // Default sort order
     column: "createdAt",
     direction: "descending",
   });
   const [page, setPage] = useState(1);
   const debouncedFilterValue = useDebounce(filterValue, 500);
 
-  // Dynamic Query Key
+  // ⭐ UPDATED Dynamic Query Key to include new filters
   const queryKey = useMemo(
     () => [
       "documents-client",
       page,
       rowsPerPage,
       debouncedFilterValue,
+      selectedType, // ADDED
+      selectedSchool, // ADDED
+      selectedSubject, // ADDED
       sortDescriptor,
     ],
-    [page, rowsPerPage, debouncedFilterValue, sortDescriptor],
+    [
+      page,
+      rowsPerPage,
+      debouncedFilterValue,
+      selectedType,
+      selectedSchool,
+      selectedSubject,
+      sortDescriptor,
+    ],
   );
 
   // --- Data Fetching (useQuery) ---
@@ -62,6 +101,7 @@ export default function ResourcePage() {
     queryKey: queryKey,
     queryFn: async () => {
       try {
+        // ⭐ UPDATED queryFn to build params with new filters
         const params = new URLSearchParams({
           page: String(page),
           pageSize: String(rowsPerPage),
@@ -69,6 +109,9 @@ export default function ResourcePage() {
           sortOrder: sortDescriptor.direction === "ascending" ? "asc" : "desc",
         });
         if (debouncedFilterValue) params.set("search", debouncedFilterValue);
+        if (selectedType) params.set("type", selectedType); // ADDED
+        if (selectedSchool) params.set("school", selectedSchool); // ADDED
+        if (selectedSubject) params.set("subject", selectedSubject); // ADDED
 
         const queryString = `?${params.toString()}`;
         const res = await documentApi.getDocuments(queryString);
@@ -95,9 +138,7 @@ export default function ResourcePage() {
 
   const getFileIcon = (type: string | undefined) => {
     if (!type) return <File size={28} className="text-gray-500" />;
-
     const lowerType = type.toLowerCase();
-
     if (lowerType.includes("pdf"))
       return <FileText size={28} className="text-red-600" />;
     if (lowerType.includes("image"))
@@ -109,7 +150,7 @@ export default function ResourcePage() {
     return <File size={28} className="text-blue-600" />;
   };
 
-  // --- Render Logic (using the same loading/error checks as the admin page) ---
+  // --- Render Logic ---
 
   if (isLoading)
     return (
@@ -127,8 +168,24 @@ export default function ResourcePage() {
       </div>
     );
 
+  // --- Event Handlers for Filters (to reset page) ---
   const handleSearchChange = (value?: string) => {
     setFilterValue(value || "");
+    setPage(1);
+  };
+
+  const handleTypeChange = (value?: string) => {
+    setSelectedType(value || null);
+    setPage(1);
+  };
+
+  const handleSchoolChange = (value?: string) => {
+    setSelectedSchool(value || null);
+    setPage(1);
+  };
+
+  const handleSubjectChange = (value?: string) => {
+    setSelectedSubject(value || null);
     setPage(1);
   };
 
@@ -139,23 +196,51 @@ export default function ResourcePage() {
           📚 Available Resources
         </h1>
 
-        {/* Search Bar */}
-        <div className="mb-8 max-w-lg">
-          <Input
+        {/* ⭐ UPDATED Search & Filter Bar */}
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
+          <div className="md:col-span-2">
+            <Input
+              isClearable
+              placeholder="Search documents by title or description..."
+              startContent={<Search size={20} />}
+              value={filterValue}
+              onClear={() => handleSearchChange("")} // Use handler
+              onValueChange={handleSearchChange}
+            />
+          </div>
+          <Select
             isClearable
-            placeholder="Search documents by title or description..."
-            startContent={<Search size={20} />}
-            value={filterValue}
-            onClear={() => setFilterValue("")}
-            onValueChange={handleSearchChange}
+            placeholder="Filter by Type"
+            items={documentTypes}
+            value={selectedType || undefined} // Handle null state
+            onClear={() => handleTypeChange(undefined)}
+            onValueChange={handleTypeChange}
+          />
+          <Select
+            isClearable
+            placeholder="Filter by School"
+            items={schools}
+            value={selectedSchool || undefined}
+            onClear={() => handleSchoolChange(undefined)}
+            onValueChange={handleSchoolChange}
+          />
+          <Select
+            isClearable
+            placeholder="Filter by Subject"
+            items={subjects}
+            value={selectedSubject || undefined}
+            onClear={() => handleSubjectChange(undefined)}
+            onValueChange={handleSubjectChange}
           />
         </div>
 
         {/* Empty State */}
-        {documents.length === 0 && (
+        {documents.length === 0 && !isLoading && (
           <div className="flex justify-center items-center h-64 flex-col text-gray-500">
             <File size={48} className="mb-4" />
-            <p className="text-xl">No documents match your search.</p>
+            <p className="text-xl">
+              No documents match your search or filters.
+            </p>
           </div>
         )}
 
@@ -166,6 +251,7 @@ export default function ResourcePage() {
               key={doc.id}
               className="group flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-md transition-all duration-300 hover:shadow-xl"
             >
+              {/* ... (rest of the card component is unchanged) ... */}
               {/* File Icon & Header */}
               <div className="flex items-start gap-4 mb-4">
                 <div className="flex-shrink-0 p-3 rounded-xl border border-gray-300 dark:border-gray-600">

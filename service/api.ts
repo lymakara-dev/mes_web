@@ -69,7 +69,7 @@ class ApiService {
       console.error(
         "Error updating data:",
         error.response?.data || error.message,
-      );
+      );  
       throw error;
     }
   }

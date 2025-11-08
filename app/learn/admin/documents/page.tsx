@@ -18,11 +18,12 @@ import {
   useDisclosure,
   addToast,
   Card,
-  Modal, // Import Modal for the new UX
+  Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Select, // ⭐ IMPORTED Select
 } from "@heroui/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -53,6 +54,28 @@ export interface IPaginatedDocuments {
   rows: Doc[];
 }
 
+// =======================================================
+// ⭐ Mock Data for Filters
+// =======================================================
+const documentTypes = [
+  { value: "pdf", label: "PDF" },
+  { value: "image", label: "Image" },
+  { value: "spreadsheet", label: "Spreadsheet" },
+  { value: "archive", label: "Archive" },
+  { value: "other", label: "Other" },
+];
+const schools = [
+  { value: "school-of-engineering", label: "School of Engineering" },
+  { value: "school-of-business", label: "School of Business" },
+  { value: "school-of-arts", label: "School of Arts" },
+];
+const subjects = [
+  { value: "computer-science", label: "Computer Science" },
+  { value: "mathematics", label: "Mathematics" },
+  { value: "finance", label: "Finance" },
+  { value: "history", label: "History" },
+];
+
 const columns = [
   { name: "TITLE", uid: "title", sortable: true },
   { name: "DESCRIPTION", uid: "description" },
@@ -65,7 +88,7 @@ const columns = [
 const INITIAL_VISIBLE_COLUMNS = ["title", "fileSize", "createdAt", "actions"];
 
 // =======================================================
-// ⭐ FIXED: Document Form Modal Component
+// ⭐ Document Form Modal Component (No changes here)
 // =======================================================
 interface DocumentModalProps {
   isOpen: boolean;
@@ -90,21 +113,18 @@ const DocumentFormModal: React.FC<DocumentModalProps> = ({
     initialData?.description || "",
   );
   const [file, setFile] = useState<File | null>(null);
-  // ⭐ NEW STATE: Used to completely reset the file input element
   const [fileInputKey, setFileInputKey] = useState(Date.now());
 
   React.useEffect(() => {
     if (isOpen) {
-      // Reset state when modal opens, based on initialData
       setTitle(initialData?.title || "");
       setDescription(initialData?.description || "");
       setFile(null);
-      // ⭐ FIX 1: Reset the input key to force re-render/clear the browser's file selection
       setFileInputKey(Date.now());
     }
   }, [isOpen, initialData]);
 
-  // --- Mutations (useMutation logic is fine, no changes needed) ---
+  // --- Mutations ---
   const { mutate: saveDocument, isPending: isSaving } = useMutation({
     mutationFn: ({
       id,
@@ -117,7 +137,6 @@ const DocumentFormModal: React.FC<DocumentModalProps> = ({
       description: string;
       file?: File;
     }) => {
-      // ... (mutation logic remains the same)
       const dto: UpdateDocumentDto = { title, description };
       if (id) {
         return documentApi.updateDocument(id, dto, file);
@@ -193,8 +212,6 @@ const DocumentFormModal: React.FC<DocumentModalProps> = ({
                 value={description}
                 onValueChange={setDescription}
               />
-
-              {/* ⭐ FIX 2: Added the key to force input reset */}
               <Input
                 key={fileInputKey}
                 type="file"
@@ -235,6 +252,11 @@ export default function DocumentManagementPage() {
 
   // --- Table State (Controls) ---
   const [filterValue, setFilterValue] = useState("");
+  // ⭐ ADDED state for new dropdown filters
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [selectedSchool, setSelectedSchool] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+
   const [visibleColumns, setVisibleColumns] = useState<"all" | Set<React.Key>>(
     new Set(INITIAL_VISIBLE_COLUMNS),
   );
@@ -246,12 +268,12 @@ export default function DocumentManagementPage() {
   const [page, setPage] = useState(1);
   const debouncedFilterValue = useDebounce(filterValue, 500);
 
-  // --- Modal State (UPDATED) ---
+  // --- Modal State ---
   const {
     isOpen: isFormOpen,
     onOpen: onFormOpen,
     onOpenChange: onFormOpenChange,
-  } = useDisclosure(); // New disclosure for the form modal
+  } = useDisclosure();
   const {
     isOpen: isConfirmOpen,
     onOpen: onConfirmOpen,
@@ -261,16 +283,27 @@ export default function DocumentManagementPage() {
   const [selectedDocument, setSelectedDocument] = useState<Doc | null>(null);
   const [deleteDocumentId, setDeleteDocumentId] = useState<number | null>(null);
 
-  // Dynamic Query Key
+  // ⭐ UPDATED Dynamic Query Key
   const queryKey = useMemo(
     () => [
       "documents",
       page,
       rowsPerPage,
       debouncedFilterValue,
+      selectedType, // ADDED
+      selectedSchool, // ADDED
+      selectedSubject, // ADDED
       sortDescriptor,
     ],
-    [page, rowsPerPage, debouncedFilterValue, sortDescriptor],
+    [
+      page,
+      rowsPerPage,
+      debouncedFilterValue,
+      selectedType,
+      selectedSchool,
+      selectedSubject,
+      sortDescriptor,
+    ],
   );
 
   // --- Data Fetching (useQuery) ---
@@ -278,6 +311,7 @@ export default function DocumentManagementPage() {
     queryKey: queryKey,
     queryFn: async () => {
       try {
+        // ⭐ UPDATED queryFn to build params
         const params = new URLSearchParams({
           page: String(page),
           pageSize: String(rowsPerPage),
@@ -285,6 +319,9 @@ export default function DocumentManagementPage() {
           sortOrder: sortDescriptor.direction === "ascending" ? "asc" : "desc",
         });
         if (debouncedFilterValue) params.set("search", debouncedFilterValue);
+        if (selectedType) params.set("type", selectedType); // ADDED
+        if (selectedSchool) params.set("school", selectedSchool); // ADDED
+        if (selectedSubject) params.set("subject", selectedSubject); // ADDED
 
         const queryString = `?${params.toString()}`;
         const res = await documentApi.getDocuments(queryString);
@@ -300,15 +337,15 @@ export default function DocumentManagementPage() {
   const documents = documentsResponse?.rows || [];
   const totalDocuments = documentsResponse?.count || 0;
 
-  // --- Handlers (UPDATED) ---
-  const handleOpenCreate = () => {
-    setSelectedDocument(null); // Clear selection for create mode
+  // --- Handlers ---
+  const handleOpenCreate = useCallback(() => {
+    setSelectedDocument(null);
     onFormOpen();
-  };
+  }, [onFormOpen]);
 
   const handleEdit = (doc: Doc) => {
     setSelectedDocument(doc);
-    onFormOpen(); // Open the modal
+    onFormOpen();
   };
 
   const handleOpenDelete = (docId: number) => {
@@ -316,7 +353,7 @@ export default function DocumentManagementPage() {
     onConfirmOpen();
   };
 
-  // --- Delete Mutation (Re-used from previous code) ---
+  // --- Delete Mutation ---
   const { mutate: deleteDocument, isPending: isDeleting } = useMutation({
     mutationFn: (id: number) => documentApi.deleteDocument(id),
     onSuccess: () => {
@@ -340,7 +377,7 @@ export default function DocumentManagementPage() {
     }
   };
 
-  // --- Table Content Helpers (No change needed here) ---
+  // --- Table Content Helpers ---
   const headerColumns = useMemo(() => {
     if (visibleColumns === "all") return columns;
     return columns.filter((col) =>
@@ -361,9 +398,25 @@ export default function DocumentManagementPage() {
     setPage(1);
   }, []);
 
+  // ⭐ ADDED Filter Handlers
+  const handleTypeChange = useCallback((value?: string) => {
+    setSelectedType(value || null);
+    setPage(1);
+  }, []);
+
+  const handleSchoolChange = useCallback((value?: string) => {
+    setSelectedSchool(value || null);
+    setPage(1);
+  }, []);
+
+  const handleSubjectChange = useCallback((value?: string) => {
+    setSelectedSubject(value || null);
+    setPage(1);
+  }, []);
+
   const renderCell = useCallback((doc: Doc, columnKey: React.Key) => {
     const cellValue = (doc as any)[columnKey as any];
-    // ... (renderCell logic remains the same, using handleEdit) ...
+    // ... (rest of renderCell is unchanged) ...
     switch (columnKey) {
       case "title":
         return (
@@ -409,7 +462,7 @@ export default function DocumentManagementPage() {
               <DropdownMenu aria-label="Document Actions">
                 <DropdownItem
                   key="edit"
-                  onPress={() => handleEdit(doc)} // Calls handler to open modal
+                  onPress={() => handleEdit(doc)}
                   startContent={<Edit size={16} />}
                 >
                   Edit
@@ -430,12 +483,13 @@ export default function DocumentManagementPage() {
       default:
         return cellValue;
     }
-  }, []);
+  }, []); // Note: handleEdit and handleOpenDelete are stable, no need for useCallback
 
-  // --- Top Content (UPDATED button action) ---
+  // --- ⭐ UPDATED Top Content ---
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
+        {/* Row 1: Search and Action Buttons */}
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -466,7 +520,6 @@ export default function DocumentManagementPage() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            {/* ⭐ UPDATED: Button opens the modal */}
             <Button
               color="primary"
               endContent={<Plus />}
@@ -476,6 +529,36 @@ export default function DocumentManagementPage() {
             </Button>
           </div>
         </div>
+
+        {/* ⭐ ADDED Row 2: Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Select
+            isClearable
+            placeholder="Filter by Type"
+            items={documentTypes}
+            value={selectedType || undefined}
+            onClear={() => handleTypeChange(undefined)}
+            onValueChange={handleTypeChange}
+          />
+          <Select
+            isClearable
+            placeholder="Filter by School"
+            items={schools}
+            value={selectedSchool || undefined}
+            onClear={() => handleSchoolChange(undefined)}
+            onValueChange={handleSchoolChange}
+          />
+          <Select
+            isClearable
+            placeholder="Filter by Subject"
+            items={subjects}
+            value={selectedSubject || undefined}
+            onClear={() => handleSubjectChange(undefined)}
+            onValueChange={handleSubjectChange}
+          />
+        </div>
+
+        {/* Row 3: Count and Rows per page */}
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
             Total {totalDocuments} documents
@@ -502,6 +585,13 @@ export default function DocumentManagementPage() {
     onSearchChange,
     totalDocuments,
     rowsPerPage,
+    handleOpenCreate,
+    selectedType, // ADDED
+    selectedSchool, // ADDED
+    selectedSubject, // ADDED
+    handleTypeChange, // ADDED
+    handleSchoolChange, // ADDED
+    handleSubjectChange, // ADDED
   ]);
 
   // --- Bottom Content (Pagination) ---
@@ -525,7 +615,6 @@ export default function DocumentManagementPage() {
 
   return (
     <>
-      {/* ⭐ NEW: Document Form Modal */}
       <DocumentFormModal
         isOpen={isFormOpen}
         onClose={onFormOpenChange}
@@ -546,9 +635,6 @@ export default function DocumentManagementPage() {
         <div className="mx-auto max-w-7xl">
           <h1 className="text-3xl font-bold mb-6">Document Management</h1>
 
-          {/* ⭐ REMOVED: The Card containing the form is gone from the main page body */}
-
-          {/* Document Table */}
           <Table
             isHeaderSticky
             aria-label="Document management table"

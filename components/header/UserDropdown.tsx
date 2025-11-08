@@ -15,6 +15,8 @@ export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
+  // const token =
+  //   typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   const { data, isLoading, isError } = useQuery<User>({
     queryKey: ["getProfile"],
@@ -22,12 +24,10 @@ export default function UserDropdown() {
       const res = await apiService.get<User>(PROFILE_ENDPOINT);
       return res.data;
     },
+    // enabled: !!token,
     retry: false,
   });
 
-  // ---------------------------------------------------
-  // 2. LOGOUT MUTATION - CLIENT-SIDE ONLY
-  // ---------------------------------------------------
   // In UserDropdown.tsx
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -39,7 +39,6 @@ export default function UserDropdown() {
       }
       return true;
     },
-    // ⭐️ FIX: Use onSettled for cache cleanup AND immediate navigation
     onSettled: () => {
       // 1. Remove the query from the cache
       queryClient.removeQueries({ queryKey: ["getProfile"] });
@@ -48,7 +47,6 @@ export default function UserDropdown() {
       setIsOpen(false);
 
       // 3. Navigate immediately (router.replace is good for auth changes)
-      // This happens so fast the failing background query is often suppressed.
       router.replace("/auth/login");
     },
   });

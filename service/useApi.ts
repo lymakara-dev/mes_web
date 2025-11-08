@@ -1,4 +1,3 @@
-import { School } from "@/types/school";
 import api from "./api";
 import { User } from "@/types/user";
 
